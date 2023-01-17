@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour
     private bool isOnRightWall_;
     private bool isOnLeftWall_;
     private bool isJumping_;
+
+    private bool isJumpCut_;
+    private bool isDashAttacking_ = false;
     private bool wasOnGround = true;
 
     //private bool isWallJumping_;
@@ -50,26 +53,42 @@ public class PlayerController : MonoBehaviour
     #region Layers & Tags
     [Header("Layers & Tags")]
     [SerializeField] private LayerMask groundLayer_;
+    [Space(5)]
     #endregion
 
+    [Header("Run Parameters")]
     [SerializeField] private float moveSpeed_;
     [SerializeField] private float velPower_;
-
     [SerializeField] private float acceleration_;
     [SerializeField] private float deccelaration_;
-    [SerializeField] private float fallClamp_;
 
-    [Range(0, 1)] public float jumpCutMult;
+    [Range(0, 1f)]
+    [SerializeField] private float accelInAir;
+    [Range(0, 1f)]
+    [SerializeField] private float deccelInAir;
+
+    [Space(5)]
+
+    [SerializeField] private float fallClamp_;
+    [SerializeField] private float jumpCutGravityMult;
 
     [Range(0, 0.5f)] public float coyoteTime;
     [Range(0, 1.5f)] public float jumpBufferTime;
+
+    [SerializeField] private float jumpApexTimeThreshold;
+
+    [Range(0, 1f)]
+    [SerializeField] private float jumpApexGravityMult;
+
+    [SerializeField] private float jumpApexAccelerationMult;
+    [SerializeField] private float jumpApexMaxSpeedMult;
 
     public float fallGravityMult;
     public float gravityScale;
     public float frictionAmount;
     public float jumpForce_;
 
-    [System.NonSerialized] public bool isFacingRight;
+    private bool isFacingRight;
 
     private void Awake()
     {
@@ -85,6 +104,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         isFacingRight = true;
+        SetGravityScale(gravityScale);
     }
 
     private void Update()
@@ -120,7 +140,6 @@ public class PlayerController : MonoBehaviour
         if (Physics2D.OverlapBox(groundCheckPoint_.position, groundCheckSize_, 0, groundLayer_))
         {
             isGrounded_ = true;
-            Debug.Log("Hit");
         }
         else
         {
@@ -164,21 +183,6 @@ public class PlayerController : MonoBehaviour
         }
         #endregion
 
-        #region Gravity
-        if (rb_.velocity.y < 0)
-        {
-            rb_.gravityScale = gravityScale * fallGravityMult;
-        }
-        else
-        {
-            rb_.gravityScale = gravityScale;
-        }
-        if (rb_.velocity.y < 0 && rb_.velocity.y < fallClamp_)
-        {
-            rb_.velocity = new Vector2(rb_.velocity.x, fallClamp_);
-        }
-        #endregion
-
         #region JUMP
         OnJump();
 
@@ -187,23 +191,52 @@ public class PlayerController : MonoBehaviour
             isJumping_ = false;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && CanJump())
+        if (CanJump())
         {
-            isJumping_ = true;
-            Jump();
+            isJumpCut_ = false;
         }
 
         if (CanJump() && lastPressedJumpTime > 0)
         {
             isJumping_ = true;
+            isJumpCut_ = false;
             Jump();
         }
+
         //Jump Cut
         if (Input.GetKeyUp(KeyCode.Space))
         {
             OnJumpUp();
         }
         #endregion
+
+        #region Gravity
+        if (!isDashAttacking_)
+        {
+            if (rb_.velocity.y < 0)
+            {
+                SetGravityScale(gravityScale * fallGravityMult);
+                rb_.velocity = new Vector2(rb_.velocity.x, Mathf.Max(rb_.velocity.y, -fallClamp_));
+            }
+            else if (isJumpCut_)
+            {
+                SetGravityScale(gravityScale * jumpCutGravityMult);
+                rb_.velocity = new Vector2(rb_.velocity.x, Mathf.Max(rb_.velocity.y, -fallClamp_));
+            }
+            else if (isJumping_ && Mathf.Abs(rb_.velocity.y) < jumpApexTimeThreshold)
+            {
+                SetGravityScale(gravityScale * jumpApexGravityMult);
+                Debug.Log("Apex");
+            }
+            else
+            {
+                SetGravityScale(gravityScale);
+            }
+        }
+
+        #endregion
+
+
 
         if (lastOnGroundTime > 0 && Mathf.Abs(moveInput_) < 0.01f)
         {
@@ -217,17 +250,36 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         #region INPUT HANDLER
-        Run();
+        Run(1);
         #endregion
     }
 
-    private void Run()
+    private void Run(float lerpAmounts)
     {
         float targetSpeed = moveInput_ * moveSpeed_;
+        targetSpeed = Mathf.Lerp(rb_.velocity.x, targetSpeed, lerpAmounts);
+
+        float accelRate;
+
+        if (lastOnGroundTime > 0)
+        {
+            accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration_ : deccelaration_;
+        }
+        else
+        {
+            accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration_ * accelInAir : deccelaration_ * deccelInAir;
+        }
+
+        if (isJumping_ && Mathf.Abs(rb_.velocity.y) < jumpApexTimeThreshold)
+        {
+            accelRate *= jumpApexAccelerationMult;
+            targetSpeed *= jumpApexMaxSpeedMult;
+        }
+
         float speedDiff = targetSpeed - rb_.velocity.x;
-        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration_ : deccelaration_;
-        float movement = Mathf.Pow(Mathf.Abs(speedDiff) * accelRate, velPower_) * Mathf.Sign(speedDiff);
-        rb_.AddForce(movement * Vector2.right);
+
+        float movement = speedDiff * accelRate;
+        rb_.AddForce(movement * Vector2.right, ForceMode2D.Force);
     }
 
     private void Jump()
@@ -259,27 +311,25 @@ public class PlayerController : MonoBehaviour
 
     public void OnJumpUp()
     {
-        if (CanJumpCut() && rb_.velocity.y > 0)
+        if (CanJumpCut())
         {
-            JumpCut();
-        }
-    }
-    public void OnJumpDown()
-    {
-        if (CanJumpCut() && rb_.velocity.y < 0)
-        {
-            JumpCut();
+            isJumpCut_ = true;
         }
     }
 
     private bool CanJumpCut()
     {
-        return isJumping_;
+        return isJumping_ && rb_.velocity.y > 0;
     }
 
     private void JumpCut()
     {
-        rb_.AddForce(Vector2.down * rb_.velocity * (1f - jumpCutMult), ForceMode2D.Impulse);
+        rb_.AddForce(Vector2.down * rb_.velocity * (1f - jumpCutGravityMult), ForceMode2D.Impulse);
+    }
+
+    public void SetGravityScale(float scale)
+    {
+        rb_.gravityScale = scale;
     }
 
     private void Turn()
@@ -299,5 +349,14 @@ public class PlayerController : MonoBehaviour
         if (isMovingRight != isFacingRight)
             Turn();
     }
-    #endregion
+    #endregion 
+    
+    private void OnDrawGizmosSelected()
+    {
+		Gizmos.color = Color.green;
+		Gizmos.DrawWireCube(groundCheckPoint_.position, groundCheckSize_);
+		Gizmos.color = Color.blue;
+		Gizmos.DrawWireCube(frontWallCheckPoint_.position, wallCheckSize_);
+		Gizmos.DrawWireCube(backWallCheckPoint_.position, wallCheckSize_);
+	}
 }

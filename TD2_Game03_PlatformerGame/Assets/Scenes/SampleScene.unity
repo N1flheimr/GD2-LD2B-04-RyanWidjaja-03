@@ -202,7 +202,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 157546466}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 4ce704ab7933efb47a2ac9ce3a0857dc, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -217,7 +217,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.8, y: 1.2}
+  m_Size: {x: 0.8, y: 1.18}
   m_EdgeRadius: 0.05
 --- !u!50 &157546469
 Rigidbody2D:
@@ -284,6 +284,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerSprite: {fileID: 1543194199}
   wallCheckTransform: {fileID: 2000257346}
+  isJumpCut_: 0
   groundCheckPoint_: {fileID: 1009229555}
   groundCheckSize_: {x: 0.75, y: 0.05}
   frontWallCheckPoint_: {fileID: 761030117}
@@ -292,18 +293,24 @@ MonoBehaviour:
   groundLayer_:
     serializedVersion: 2
     m_Bits: 64
-  moveSpeed_: 9
+  moveSpeed_: 10.5
   velPower_: 1
-  acceleration_: 12
-  deccelaration_: 16
-  fallClamp_: -15
-  jumpCutMult: 0.6
+  acceleration_: 11.5
+  deccelaration_: 11
+  accelInAir: 0.85
+  deccelInAir: 0.3
+  fallClamp_: 16
+  jumpCutGravityMult: 1.8
   coyoteTime: 0.06
   jumpBufferTime: 0.1
+  jumpApexTimeThreshold: 1.9
+  jumpApexGravityMult: 0.4
+  jumpApexAccelerationMult: 1.1
+  jumpApexMaxSpeedMult: 1.25
   fallGravityMult: 1.5
-  gravityScale: 2.1
-  frictionAmount: 1
-  jumpForce_: 16
+  gravityScale: 2.6
+  frictionAmount: 1.05
+  jumpForce_: 17.5
 --- !u!1 &228148122
 GameObject:
   m_ObjectHideFlags: 0
@@ -659,7 +666,7 @@ GameObject:
   m_Layer: 0
   m_Name: FrontWall
   m_TagString: Untagged
-  m_Icon: {fileID: 419385456094870383, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -671,7 +678,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 761030116}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.413, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0.4994, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -690,7 +697,7 @@ GameObject:
   m_Layer: 0
   m_Name: GroundCheck
   m_TagString: Untagged
-  m_Icon: {fileID: 419385456094870383, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -702,7 +709,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1009229554}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.0257, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1058,6 +1065,16 @@ Tilemap:
       serializedVersion: 2
       m_TileIndex: 8
       m_TileSpriteIndex: 8
+      m_TileMatrixIndex: 0
+      m_TileColorIndex: 0
+      m_TileObjectToInstantiateIndex: 65535
+      dummyAlignment: 0
+      m_AllTileFlags: 1073741825
+  - first: {x: -13, y: -6, z: 0}
+    second:
+      serializedVersion: 2
+      m_TileIndex: 11
+      m_TileSpriteIndex: 11
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_TileObjectToInstantiateIndex: 65535
@@ -1487,7 +1504,7 @@ Tilemap:
     m_Data: {fileID: 11400000, guid: feb68131b67f5844da6a47f98b255f8d, type: 2}
   - m_RefCount: 1
     m_Data: {fileID: 11400000, guid: 1e5cc279c331c984fbe39b37f84b69b8, type: 2}
-  - m_RefCount: 3
+  - m_RefCount: 4
     m_Data: {fileID: 11400000, guid: 612b5cec8da20d347935410375ef74bb, type: 2}
   - m_RefCount: 6
     m_Data: {fileID: 11400000, guid: fb3c9de79206e4348a5b1694dea7918c, type: 2}
@@ -1518,7 +1535,7 @@ Tilemap:
     m_Data: {fileID: 1696232846, guid: 969104f93e0965849ab6050c217776e9, type: 3}
   - m_RefCount: 1
     m_Data: {fileID: 1841204792, guid: 969104f93e0965849ab6050c217776e9, type: 3}
-  - m_RefCount: 3
+  - m_RefCount: 4
     m_Data: {fileID: -769147918, guid: 969104f93e0965849ab6050c217776e9, type: 3}
   - m_RefCount: 6
     m_Data: {fileID: -2107605468, guid: 969104f93e0965849ab6050c217776e9, type: 3}
@@ -1527,7 +1544,7 @@ Tilemap:
   - m_RefCount: 32
     m_Data: {fileID: -148722093, guid: 969104f93e0965849ab6050c217776e9, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 66
+  - m_RefCount: 67
     m_Data:
       e00: 1
       e01: 0
@@ -1546,7 +1563,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 66
+  - m_RefCount: 67
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -1674,8 +1691,22 @@ CompositeCollider2D:
         Y: -50000000
       - X: -20000000
         Y: -60000000
-      - X: -130000000
+      - X: -119999900
         Y: -60000000
+      - X: -119999900
+        Y: -49999959
+      - X: -119999959
+        Y: -49999900
+      - X: -130000041
+        Y: -49999900
+      - X: -130000100
+        Y: -49999959
+      - X: -130000100
+        Y: -60000041
+      - X: -130000041
+        Y: -60000100
+      - X: -130000000
+        Y: -60000100
       - X: -130000000
         Y: -70000000
       - X: 130000000
@@ -1724,7 +1755,9 @@ CompositeCollider2D:
       - {x: 0.99997073, y: -5}
       - {x: -2, y: -5.000029}
       - {x: -2.0000293, y: -6}
-      - {x: -13, y: -6.000029}
+      - {x: -11.99999, y: -5.9999704}
+      - {x: -12.000026, y: -4.99999}
+      - {x: -13.00001, y: -5.0000253}
       - {x: -12.99997, y: -7}
     - - {x: 5.9999747, y: -3.00001}
       - {x: 5.9999747, y: -1.99999}
