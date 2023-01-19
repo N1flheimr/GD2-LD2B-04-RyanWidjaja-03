@@ -310,6 +310,14 @@ MonoBehaviour:
   gravityScale: 2.6
   frictionAmount: 1.05
   jumpForce_: 17.5
+  dashInputBufferTime: 0.1
+  dashAmount: 1
+  dashRefillTime: 0.1
+  dashSleepTime: 0.05
+  dashAttackTime: 0.15
+  dashEndTime: 0.15
+  dashSpeed: 30
+  dashEndSpeed: {x: 15, y: 15}
 --- !u!1 &209926303
 GameObject:
   m_ObjectHideFlags: 0

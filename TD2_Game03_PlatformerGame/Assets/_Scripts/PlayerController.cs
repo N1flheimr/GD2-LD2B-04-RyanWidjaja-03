@@ -214,7 +214,7 @@ public class PlayerController : MonoBehaviour
         {
             Sleep(dashSleepTime);
 
-            if(moveInput_ != Vector2.zero)
+            if (moveInput_ != Vector2.zero)
             {
                 _lastDashDir = moveInput_;
             }
@@ -229,8 +229,6 @@ public class PlayerController : MonoBehaviour
 
             StartCoroutine(nameof(StartDash), _lastDashDir);
         }
-
-        Debug.Log(CanDash());
 
         #endregion
 
@@ -338,15 +336,12 @@ public class PlayerController : MonoBehaviour
         dashRefilling_ = true;
         yield return Helpers.GetWaitForSeconds(dashRefillTime);
         dashRefilling_ = false;
-        dashesLeft_ = Mathf.Min(dashAmount, dashesLeft_++);
-
-        Debug.Log("Refill");
+        dashesLeft_ = Mathf.Min(dashAmount, dashesLeft_ + 1);
+        Debug.Log(dashesLeft_);
     }
 
     private IEnumerator StartDash(Vector2 dir)
     {
-
-        Debug.Log("StartDash");
         lastOnGroundTime = 0;
         LastPressedDashTime = 0;
 
@@ -357,7 +352,7 @@ public class PlayerController : MonoBehaviour
 
         SetGravityScale(0);
 
-        while(Time.time - startTime <= dashAttackTime)
+        while (Time.time - startTime <= dashAttackTime)
         {
             rb_.velocity = dir.normalized * dashSpeed;
 
@@ -372,7 +367,7 @@ public class PlayerController : MonoBehaviour
 
         rb_.velocity = dashEndSpeed * dir.normalized;
 
-        while(Time.time - startTime <= dashEndTime)
+        while (Time.time - startTime <= dashEndTime)
         {
             yield return null;
         }
