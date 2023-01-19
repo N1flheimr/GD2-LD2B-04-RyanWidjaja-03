@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,8 +19,17 @@ public class PlayerController : MonoBehaviour
     private bool isOnLeftWall_;
     private bool isJumping_;
 
+    private bool isDashing_;
+
     private bool isJumpCut_;
+
+    //Dash
+    private int dashesLeft_;
+    private bool dashRefilling_;
+    private Vector2 _lastDashDir;
     private bool isDashAttacking_ = false;
+
+
     private bool wasOnGround = true;
 
     //private bool isWallJumping_;
@@ -31,12 +41,12 @@ public class PlayerController : MonoBehaviour
     public float lastOnWallTime { get; private set; }
     public float lastOnWallRightTime { get; private set; }
     public float lastOnWallLeftTime { get; private set; }
-    float footStepsDelay = 0.35f;
+    public float LastPressedDashTime { get; private set; }
     #endregion
 
 
     #region INPUT PARAMETERS
-    private float moveInput_;
+    private Vector2 moveInput_;
     public float lastPressedJumpTime { get; private set; }
     #endregion
 
@@ -87,6 +97,19 @@ public class PlayerController : MonoBehaviour
     public float gravityScale;
     public float frictionAmount;
     public float jumpForce_;
+    [Space(5)]
+
+    [Header("Dash Parameters")]
+    [Range(0, 0.5f)] public float dashInputBufferTime;
+
+    [SerializeField] private int dashAmount;
+    [SerializeField] private float dashRefillTime;
+    [SerializeField] private float dashSleepTime;
+    [SerializeField] private float dashAttackTime;
+    [SerializeField] private float dashEndTime;
+
+    [SerializeField] private float dashSpeed;
+    [SerializeField] private Vector2 dashEndSpeed;
 
     private bool isFacingRight;
 
@@ -114,72 +137,50 @@ public class PlayerController : MonoBehaviour
         lastOnWallTime -= Time.deltaTime;
         lastOnWallRightTime -= Time.deltaTime;
         lastOnWallLeftTime -= Time.deltaTime;
-
         lastPressedJumpTime -= Time.deltaTime;
+        LastPressedDashTime -= Time.deltaTime;
         #endregion
 
-        moveInput_ = Input.GetAxisRaw("Horizontal");
+        moveInput_.x = Input.GetAxisRaw("Horizontal");
+        moveInput_.y = Input.GetAxisRaw("Vertical");
 
         #region GENERAL CHECKS
-        if (moveInput_ != 0)
+        if (moveInput_.x != 0)
         {
-            CheckDirectionToFace(moveInput_ > 0.01f);
+            CheckDirectionToFace(moveInput_.x > 0.01f);
             if (!isJumping_ && isGrounded_)
             {
-                footStepsDelay -= Time.deltaTime;
-                if (footStepsDelay < 0f)
-                {
-                    //SoundManager
-                }
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.X))
+        {
+            OnDashInput();
         }
         #endregion
 
         #region PHYSICS CHECKS
-        //Ground Check
-        if (Physics2D.OverlapBox(groundCheckPoint_.position, groundCheckSize_, 0, groundLayer_))
+        if (!isDashing_ && !isJumping_)
         {
-            isGrounded_ = true;
-        }
-        else
-        {
-            isGrounded_ = false;
-        }
-        //Right Wall Check
-        if ((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)
-                || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight))
-        {
-            isOnRightWall_ = true;
-        }
-        else
-        {
-            isOnRightWall_ = false;
-        }
-        //Left Wall Check
-        if ((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight)
-            || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight))
-        {
-            isOnLeftWall_ = true;
-        }
-        else
-        {
-            isOnLeftWall_ = false;
-        }
-
-        if (!isJumping_)
-        {
-            if (isGrounded_)
+            //Ground Check
+            if (Physics2D.OverlapBox(groundCheckPoint_.position, groundCheckSize_, 0, groundLayer_))
             {
                 lastOnGroundTime = coyoteTime;
             }
-            if (isOnRightWall_)
+            //Right Wall Check
+            if ((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)
+                    || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight))
             {
                 lastOnWallRightTime = coyoteTime;
             }
-            if (isOnLeftWall_)
+            //Left Wall Check
+            if ((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight)
+                || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight))
             {
                 lastOnWallLeftTime = coyoteTime;
             }
+
+            lastOnWallTime = Mathf.Max(lastOnWallLeftTime, lastOnWallRightTime);
         }
         #endregion
 
@@ -191,16 +192,14 @@ public class PlayerController : MonoBehaviour
             isJumping_ = false;
         }
 
-        if (CanJump())
+        if (!isDashing_)
         {
-            isJumpCut_ = false;
-        }
-
-        if (CanJump() && lastPressedJumpTime > 0)
-        {
-            isJumping_ = true;
-            isJumpCut_ = false;
-            Jump();
+            if (CanJump() && lastPressedJumpTime > 0)
+            {
+                isJumping_ = true;
+                isJumpCut_ = false;
+                Jump();
+            }
         }
 
         //Jump Cut
@@ -208,6 +207,31 @@ public class PlayerController : MonoBehaviour
         {
             OnJumpUp();
         }
+        #endregion
+
+        #region DASH CHECKS
+        if (CanDash() && LastPressedDashTime > 0)
+        {
+            Sleep(dashSleepTime);
+
+            if(moveInput_ != Vector2.zero)
+            {
+                _lastDashDir = moveInput_;
+            }
+            else
+            {
+                _lastDashDir = isFacingRight ? Vector2.right : Vector2.left;
+            }
+
+            isDashing_ = true;
+            isJumping_ = false;
+            isJumpCut_ = false;
+
+            StartCoroutine(nameof(StartDash), _lastDashDir);
+        }
+
+        Debug.Log(CanDash());
+
         #endregion
 
         #region Gravity
@@ -238,12 +262,11 @@ public class PlayerController : MonoBehaviour
 
 
 
-        if (lastOnGroundTime > 0 && Mathf.Abs(moveInput_) < 0.01f)
+        if (lastOnGroundTime > 0 && Mathf.Abs(moveInput_.x) < 0.01f)
         {
             float amount = Mathf.Min(Mathf.Abs(rb_.velocity.x), Mathf.Abs(frictionAmount));
             amount *= Mathf.Sign(rb_.velocity.x);
             rb_.AddForce(Vector2.right * -amount, ForceMode2D.Impulse);
-            footStepsDelay = 0.35f;
         }
     }
 
@@ -256,7 +279,7 @@ public class PlayerController : MonoBehaviour
 
     private void Run(float lerpAmounts)
     {
-        float targetSpeed = moveInput_ * moveSpeed_;
+        float targetSpeed = moveInput_.x * moveSpeed_;
         targetSpeed = Mathf.Lerp(rb_.velocity.x, targetSpeed, lerpAmounts);
 
         float accelRate;
@@ -295,6 +318,67 @@ public class PlayerController : MonoBehaviour
         rb_.AddForce(Vector2.up * force, ForceMode2D.Impulse);
         #endregion
     }
+    private void OnDashInput()
+    {
+        LastPressedDashTime = dashInputBufferTime;
+    }
+
+    private bool CanDash()
+    {
+        if (!isDashing_ && dashesLeft_ < dashAmount && lastOnGroundTime > 0 && !dashRefilling_)
+        {
+            StartCoroutine(nameof(RefillDash), 1);
+        }
+
+        return dashesLeft_ > 0;
+    }
+
+    private IEnumerator RefillDash(int amount)
+    {
+        dashRefilling_ = true;
+        yield return Helpers.GetWaitForSeconds(dashRefillTime);
+        dashRefilling_ = false;
+        dashesLeft_ = Mathf.Min(dashAmount, dashesLeft_++);
+
+        Debug.Log("Refill");
+    }
+
+    private IEnumerator StartDash(Vector2 dir)
+    {
+
+        Debug.Log("StartDash");
+        lastOnGroundTime = 0;
+        LastPressedDashTime = 0;
+
+        float startTime = Time.time;
+
+        dashesLeft_--;
+        isDashAttacking_ = true;
+
+        SetGravityScale(0);
+
+        while(Time.time - startTime <= dashAttackTime)
+        {
+            rb_.velocity = dir.normalized * dashSpeed;
+
+            yield return null;
+        }
+
+        startTime = Time.time;
+
+        isDashAttacking_ = false;
+
+        SetGravityScale(gravityScale);
+
+        rb_.velocity = dashEndSpeed * dir.normalized;
+
+        while(Time.time - startTime <= dashEndTime)
+        {
+            yield return null;
+        }
+
+        isDashing_ = false;
+    }
 
     private bool CanJump()
     {
@@ -332,6 +416,18 @@ public class PlayerController : MonoBehaviour
         rb_.gravityScale = scale;
     }
 
+    private void Sleep(float duration)
+    {
+        StartCoroutine(nameof(PerformSleep), duration);
+    }
+
+    private IEnumerator PerformSleep(float duration)
+    {
+        Time.timeScale = 0;
+        yield return Helpers.GetWaitForSecondsRealTime(duration);
+        Time.timeScale = 1;
+    }
+
     private void Turn()
     {
         playerSprite.flipX = !playerSprite.flipX;
@@ -349,14 +445,14 @@ public class PlayerController : MonoBehaviour
         if (isMovingRight != isFacingRight)
             Turn();
     }
-    #endregion 
-    
+    #endregion
+
     private void OnDrawGizmosSelected()
     {
-		Gizmos.color = Color.green;
-		Gizmos.DrawWireCube(groundCheckPoint_.position, groundCheckSize_);
-		Gizmos.color = Color.blue;
-		Gizmos.DrawWireCube(frontWallCheckPoint_.position, wallCheckSize_);
-		Gizmos.DrawWireCube(backWallCheckPoint_.position, wallCheckSize_);
-	}
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(groundCheckPoint_.position, groundCheckSize_);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(frontWallCheckPoint_.position, wallCheckSize_);
+        Gizmos.DrawWireCube(backWallCheckPoint_.position, wallCheckSize_);
+    }
 }
