@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.TextCore.Text;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance;
+
+    private PlayerInput controls;
 
     #region COMPONENTS
     private Rigidbody2D rb_;
@@ -18,6 +21,7 @@ public class PlayerController : MonoBehaviour
     private bool isOnRightWall_;
     private bool isOnLeftWall_;
     private bool isJumping_;
+    private bool isSliding_;
 
     private bool isDashing_;
 
@@ -32,9 +36,9 @@ public class PlayerController : MonoBehaviour
 
     private bool wasOnGround = true;
 
-    //private bool isWallJumping_;
-    //private int lastWallJumpDir_;
-    //private float wallJumpStartTime_;
+    private bool isWallJumping_;
+    private int lastWallJumpDir_;
+    private float wallJumpStartTime_;
     //public bool useWallJump = true;
 
     public float lastOnGroundTime { get; private set; }
@@ -101,6 +105,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Dash Parameters")]
     [Range(0, 0.5f)] public float dashInputBufferTime;
+    [Range(0f, 1f)] public float dashEndRunLerp;
 
     [SerializeField] private int dashAmount;
     [SerializeField] private float dashRefillTime;
@@ -110,6 +115,12 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float dashSpeed;
     [SerializeField] private Vector2 dashEndSpeed;
+    [Space(5)]
+
+
+    [Header("Slide Parameters")]
+    [SerializeField] private float slideSpeed;
+    [SerializeField] private float slideAccel;
 
     private bool isFacingRight;
 
@@ -122,12 +133,16 @@ public class PlayerController : MonoBehaviour
         {
             Instance = this;
         }
+
+        controls = new PlayerInput();
     }
 
     private void Start()
     {
         isFacingRight = true;
         SetGravityScale(gravityScale);
+
+        controls.PlayerControlOnGround.Move.performed += ctx => StartAction();
     }
 
     private void Update()
@@ -168,16 +183,18 @@ public class PlayerController : MonoBehaviour
                 lastOnGroundTime = coyoteTime;
             }
             //Right Wall Check
-            if ((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)
-                    || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight))
+            if (((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)
+                    || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight)))
             {
                 lastOnWallRightTime = coyoteTime;
+                Debug.Log("lastOnWallRight" + lastOnWallRightTime);
             }
             //Left Wall Check
-            if ((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight)
-                || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight))
+            if (((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight)
+                || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)))
             {
                 lastOnWallLeftTime = coyoteTime;
+                Debug.Log("lastOnWallLeft" + lastOnWallLeftTime);
             }
 
             lastOnWallTime = Mathf.Max(lastOnWallLeftTime, lastOnWallRightTime);
@@ -232,10 +249,28 @@ public class PlayerController : MonoBehaviour
 
         #endregion
 
+        #region SLIDE CHECKS
+
+        if (CanSlide() && ((lastOnWallLeftTime > 0 && moveInput_.x < 0) ||
+                (lastOnWallRightTime > 0 && moveInput_.x > 0)))
+        {
+            isSliding_ = true;
+        }
+        else
+        {
+            isSliding_ = false;
+        }
+
+        #endregion
+
         #region Gravity
         if (!isDashAttacking_)
         {
-            if (rb_.velocity.y < 0)
+            if (isSliding_)
+            {
+                SetGravityScale(0.2f);
+            }
+            else if (rb_.velocity.y < 0)
             {
                 SetGravityScale(gravityScale * fallGravityMult);
                 rb_.velocity = new Vector2(rb_.velocity.x, Mathf.Max(rb_.velocity.y, -fallClamp_));
@@ -248,12 +283,15 @@ public class PlayerController : MonoBehaviour
             else if (isJumping_ && Mathf.Abs(rb_.velocity.y) < jumpApexTimeThreshold)
             {
                 SetGravityScale(gravityScale * jumpApexGravityMult);
-                Debug.Log("Apex");
             }
             else
             {
                 SetGravityScale(gravityScale);
             }
+        }
+        else
+        {
+            SetGravityScale(0);
         }
 
         #endregion
@@ -271,8 +309,25 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         #region INPUT HANDLER
-        Run(1);
+        if (!isDashing_)
+        {
+            Run(1);
+        }
+        else if (isDashAttacking_)
+        {
+            Run(dashEndRunLerp);
+        }
         #endregion
+
+        if (isSliding_ && rb_.velocity.y < -0.1f)
+        {
+            Slide();
+        }
+    }
+
+    private void StartAction()
+    {
+
     }
 
     private void Run(float lerpAmounts)
@@ -337,7 +392,6 @@ public class PlayerController : MonoBehaviour
         yield return Helpers.GetWaitForSeconds(dashRefillTime);
         dashRefilling_ = false;
         dashesLeft_ = Mathf.Min(dashAmount, dashesLeft_ + 1);
-        Debug.Log(dashesLeft_);
     }
 
     private IEnumerator StartDash(Vector2 dir)
@@ -406,6 +460,30 @@ public class PlayerController : MonoBehaviour
         rb_.AddForce(Vector2.down * rb_.velocity * (1f - jumpCutGravityMult), ForceMode2D.Impulse);
     }
 
+    private bool CanSlide()
+    {
+        if (lastOnWallTime > 0 && !isJumping_ && !isDashing_ && lastOnGroundTime <= 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    private void Slide()
+    {
+        float speedDif = slideSpeed - rb_.velocity.y;
+        float movement = speedDif * -slideAccel;
+
+        movement =
+            Mathf.Clamp(
+                movement, -Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime), Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime));
+
+        rb_.AddForce(movement * Vector2.up);
+        Debug.Log("rb_vel.y: " + movement);
+    }
+
     public void SetGravityScale(float scale)
     {
         rb_.gravityScale = scale;
@@ -441,6 +519,16 @@ public class PlayerController : MonoBehaviour
             Turn();
     }
     #endregion
+
+    private void OnEnable()
+    {
+        controls.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controls.Disable();
+    }
 
     private void OnDrawGizmosSelected()
     {
