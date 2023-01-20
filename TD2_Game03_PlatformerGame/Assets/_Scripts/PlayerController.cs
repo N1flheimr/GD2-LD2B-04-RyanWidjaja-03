@@ -371,6 +371,18 @@ public class PlayerController : MonoBehaviour
         rb_.AddForce(Vector2.up * force, ForceMode2D.Impulse);
         #endregion
     }
+
+    private bool CanWallJump()
+    {
+        return lastPressedJumpTime > 0 && lastOnWallTime > 0 && lastOnGroundTime <= 0 &&
+            (!isWallJumping_ || (lastOnWallRightTime > 0 && lastWallJumpDir_ == 1)
+            || (lastOnWallLeftTime > 0 && lastWallJumpDir_ == -1));
+    }
+
+    private bool CanWallJumpCut()
+    {
+        return isWallJumping_ && rb_.velocity.y > 0f;
+    }
     private void OnDashInput()
     {
         LastPressedDashTime = dashInputBufferTime;
@@ -462,7 +474,7 @@ public class PlayerController : MonoBehaviour
 
     private bool CanSlide()
     {
-        if (lastOnWallTime > 0 && !isJumping_ && !isDashing_ && lastOnGroundTime <= 0)
+        if (lastOnWallTime > 0 && !isJumping_ && !isWallJumping_ && !isDashing_ && lastOnGroundTime <= 0)
         {
             return true;
         }

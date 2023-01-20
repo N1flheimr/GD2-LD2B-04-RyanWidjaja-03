@@ -294,22 +294,22 @@ MonoBehaviour:
     m_Bits: 64
   moveSpeed_: 9
   velPower_: 1
-  acceleration_: 11.5
+  acceleration_: 11
   deccelaration_: 13
   accelInAir: 0.85
   deccelInAir: 0.3
   fallClamp_: 16
-  jumpCutGravityMult: 1.8
+  jumpCutGravityMult: 2
   coyoteTime: 0.06
   jumpBufferTime: 0.1
-  jumpApexTimeThreshold: 1.9
+  jumpApexTimeThreshold: 0.9
   jumpApexGravityMult: 0.25
   jumpApexAccelerationMult: 1.1
-  jumpApexMaxSpeedMult: 1.25
-  fallGravityMult: 1.5
-  gravityScale: 1.8
+  jumpApexMaxSpeedMult: 1.2
+  fallGravityMult: 1.8
+  gravityScale: 2
   frictionAmount: 1
-  jumpForce_: 16
+  jumpForce_: 15
   dashInputBufferTime: 0.1
   dashEndRunLerp: 0.4
   dashAmount: 2
@@ -720,7 +720,7 @@ GameObject:
   m_Layer: 0
   m_Name: FrontWall
   m_TagString: Untagged
-  m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -751,7 +751,7 @@ GameObject:
   m_Layer: 0
   m_Name: GroundCheck
   m_TagString: Untagged
-  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -1976,7 +1976,7 @@ GameObject:
   m_Layer: 0
   m_Name: BackWall
   m_TagString: Untagged
-  m_Icon: {fileID: 5721338939258241955, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
