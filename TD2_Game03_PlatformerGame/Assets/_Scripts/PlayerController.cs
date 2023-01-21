@@ -96,6 +96,13 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float jumpApexAccelerationMult;
     [SerializeField] private float jumpApexMaxSpeedMult;
+    [Space(5)]
+
+    [Header("Wall Jump Parameters")]
+    [SerializeField] private Vector2 wallJumpForce;
+    [Range(0, 1f)][SerializeField] private float wallJumpRunLerp;
+    [Range(0, 0.5f)][SerializeField] private float wallJumpTime;
+    [Space(5)]
 
     public float fallGravityMult;
     public float gravityScale;
@@ -121,6 +128,8 @@ public class PlayerController : MonoBehaviour
     [Header("Slide Parameters")]
     [SerializeField] private float slideSpeed;
     [SerializeField] private float slideAccel;
+    [SerializeField] private Vector2 slideVelocity;
+    [SerializeField] private bool useSlideForce;
 
     private bool isFacingRight;
 
@@ -187,14 +196,12 @@ public class PlayerController : MonoBehaviour
                     || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight)))
             {
                 lastOnWallRightTime = coyoteTime;
-                Debug.Log("lastOnWallRight" + lastOnWallRightTime);
             }
             //Left Wall Check
             if (((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight)
                 || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)))
             {
                 lastOnWallLeftTime = coyoteTime;
-                Debug.Log("lastOnWallLeft" + lastOnWallLeftTime);
             }
 
             lastOnWallTime = Mathf.Max(lastOnWallLeftTime, lastOnWallRightTime);
@@ -209,13 +216,31 @@ public class PlayerController : MonoBehaviour
             isJumping_ = false;
         }
 
+        if (isWallJumping_ && Time.time - wallJumpStartTime_ > wallJumpTime)
+        {
+            isWallJumping_ = false;
+        }
+
         if (!isDashing_)
         {
             if (CanJump() && lastPressedJumpTime > 0)
             {
                 isJumping_ = true;
+                isWallJumping_ = false;
                 isJumpCut_ = false;
                 Jump();
+            }
+
+            else if (CanWallJump() && lastPressedJumpTime > 0)
+            {
+                isWallJumping_ = true;
+                isJumping_ = false;
+                isJumpCut_ = false;
+
+                wallJumpStartTime_ = Time.time;
+                lastWallJumpDir_ = (lastOnWallRightTime > 0) ? -1 : 1;
+
+                WallJump(lastWallJumpDir_);
             }
         }
 
@@ -311,16 +336,25 @@ public class PlayerController : MonoBehaviour
         #region INPUT HANDLER
         if (!isDashing_)
         {
-            Run(1);
+            if (isWallJumping_)
+            {
+                Run(wallJumpRunLerp);
+            }
+            else
+            {
+                Run(1);
+            }
         }
+
         else if (isDashAttacking_)
         {
             Run(dashEndRunLerp);
         }
         #endregion
 
-        if (isSliding_ && rb_.velocity.y < -0.1f)
+        if (isSliding_)
         {
+
             Slide();
         }
     }
@@ -346,7 +380,7 @@ public class PlayerController : MonoBehaviour
             accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration_ * accelInAir : deccelaration_ * deccelInAir;
         }
 
-        if (isJumping_ && Mathf.Abs(rb_.velocity.y) < jumpApexTimeThreshold)
+        if ((isJumping_ || isWallJumping_) && Mathf.Abs(rb_.velocity.y) < jumpApexTimeThreshold)
         {
             accelRate *= jumpApexAccelerationMult;
             targetSpeed *= jumpApexMaxSpeedMult;
@@ -382,6 +416,28 @@ public class PlayerController : MonoBehaviour
     private bool CanWallJumpCut()
     {
         return isWallJumping_ && rb_.velocity.y > 0f;
+    }
+
+    private void WallJump(int dir)
+    {
+        lastPressedJumpTime = 0;
+        lastOnGroundTime = 0;
+        lastOnWallRightTime = 0;
+        lastOnWallLeftTime = 0;
+
+        Vector2 force = new Vector2(wallJumpForce.x, wallJumpForce.y);
+        force.x *= dir;
+
+        if (Mathf.Sign(rb_.velocity.x) != Mathf.Sign(force.x))
+        {
+            force.x -= rb_.velocity.x;
+        }
+        if (rb_.velocity.y < 0)
+        {
+            force.y -= rb_.velocity.y;
+        }
+
+        rb_.AddForce(force, ForceMode2D.Impulse);
     }
     private void OnDashInput()
     {
@@ -456,7 +512,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnJumpUp()
     {
-        if (CanJumpCut())
+        if (CanJumpCut() || CanWallJumpCut())
         {
             isJumpCut_ = true;
         }
@@ -485,15 +541,21 @@ public class PlayerController : MonoBehaviour
     }
     private void Slide()
     {
-        float speedDif = slideSpeed - rb_.velocity.y;
-        float movement = speedDif * -slideAccel;
+        if (useSlideForce)
+        {
+            float speedDif = slideSpeed - rb_.velocity.y;
+            float movement = speedDif * -slideAccel;
 
-        movement =
-            Mathf.Clamp(
-                movement, -Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime), Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime));
+            movement =
+                Mathf.Clamp(
+                    movement, -Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime), Mathf.Abs(speedDif) * (1 / Time.fixedDeltaTime));
 
-        rb_.AddForce(movement * Vector2.up);
-        Debug.Log("rb_vel.y: " + movement);
+            rb_.AddForce(movement * Vector2.up);
+        }
+        else
+        {
+            rb_.velocity = -slideVelocity;
+        }
     }
 
     public void SetGravityScale(float scale)

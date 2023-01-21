@@ -217,7 +217,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.71, y: 1.125}
+  m_Size: {x: 0.725, y: 1.13}
   m_EdgeRadius: 0.05
 --- !u!50 &157546469
 Rigidbody2D:
@@ -231,7 +231,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.944
+  m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -292,24 +292,27 @@ MonoBehaviour:
   groundLayer_:
     serializedVersion: 2
     m_Bits: 64
-  moveSpeed_: 9
+  moveSpeed_: 9.25
   velPower_: 1
   acceleration_: 11
   deccelaration_: 13
-  accelInAir: 0.85
-  deccelInAir: 0.3
-  fallClamp_: 16
+  accelInAir: 0.9
+  deccelInAir: 0.1
+  fallClamp_: 12.85
   jumpCutGravityMult: 2
   coyoteTime: 0.06
-  jumpBufferTime: 0.1
+  jumpBufferTime: 0.095
   jumpApexTimeThreshold: 0.9
   jumpApexGravityMult: 0.25
   jumpApexAccelerationMult: 1.1
   jumpApexMaxSpeedMult: 1.2
-  fallGravityMult: 1.8
-  gravityScale: 2
+  wallJumpForce: {x: 10, y: 12}
+  wallJumpRunLerp: 0.075
+  wallJumpTime: 0.14
+  fallGravityMult: 1.65
+  gravityScale: 1.9
   frictionAmount: 1
-  jumpForce_: 15
+  jumpForce_: 14.5
   dashInputBufferTime: 0.1
   dashEndRunLerp: 0.4
   dashAmount: 2
@@ -317,10 +320,12 @@ MonoBehaviour:
   dashSleepTime: 0.05
   dashAttackTime: 0.15
   dashEndTime: 0.15
-  dashSpeed: 25
-  dashEndSpeed: {x: 15, y: 15}
-  slideSpeed: 2.5
-  slideAccel: 1
+  dashSpeed: 20
+  dashEndSpeed: {x: 10.5, y: 10.5}
+  slideSpeed: 12
+  slideAccel: 12
+  slideVelocity: {x: 0, y: 4.5}
+  useSlideForce: 0
 --- !u!1 &209926303
 GameObject:
   m_ObjectHideFlags: 0
