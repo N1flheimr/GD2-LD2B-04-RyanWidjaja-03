@@ -2,52 +2,54 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public static class Helpers
+namespace NifuDev
 {
-    private static Camera _camera;
-
-    public static Camera Camera
+    public static class Helpers
     {
-        get
+        private static Camera _camera;
+
+        public static Camera Camera
         {
-            if(_camera == null) _camera = Camera.main;
-            return _camera;
+            get
+            {
+                if (_camera == null) _camera = Camera.main;
+                return _camera;
+            }
         }
-    }
 
-    private static readonly Dictionary<float, WaitForSeconds> WaitDictionary = new Dictionary<float, WaitForSeconds>();
+        private static readonly Dictionary<float, WaitForSeconds> WaitDictionary = new Dictionary<float, WaitForSeconds>();
 
-    public static WaitForSeconds GetWaitForSeconds(float time)
-    {
-        if(WaitDictionary.TryGetValue(time,out WaitForSeconds wait))
+        public static WaitForSeconds GetWaitForSeconds(float time)
         {
-            return wait;
+            if (WaitDictionary.TryGetValue(time, out WaitForSeconds wait))
+            {
+                return wait;
+            }
+            WaitDictionary[time] = new WaitForSeconds(time);
+            return WaitDictionary[time];
         }
-        WaitDictionary[time] = new WaitForSeconds(time);
-        return WaitDictionary[time];
-    }
 
-    private static readonly Dictionary<float, WaitForSecondsRealtime> WaitForRealTimeDictionary = new Dictionary<float, WaitForSecondsRealtime>();
+        private static readonly Dictionary<float, WaitForSecondsRealtime> WaitForRealTimeDictionary = new Dictionary<float, WaitForSecondsRealtime>();
 
-    public static WaitForSecondsRealtime GetWaitForSecondsRealTime(float time)
-    {
-        if (WaitForRealTimeDictionary.TryGetValue(time, out WaitForSecondsRealtime wait))
+        public static WaitForSecondsRealtime GetWaitForSecondsRealTime(float time)
         {
-            return wait;
+            if (WaitForRealTimeDictionary.TryGetValue(time, out WaitForSecondsRealtime wait))
+            {
+                return wait;
+            }
+            WaitForRealTimeDictionary[time] = new WaitForSecondsRealtime(time);
+            return WaitForRealTimeDictionary[time];
         }
-        WaitForRealTimeDictionary[time] = new WaitForSecondsRealtime(time);
-        return WaitForRealTimeDictionary[time];
-    }
 
-    private static PointerEventData _eventDataCurrentPosition;
-    private static List<RaycastResult> _results;
+        private static PointerEventData _eventDataCurrentPosition;
+        private static List<RaycastResult> _results;
 
-    public static bool IsOverUI()
-    {
-        _eventDataCurrentPosition = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
-        _results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(_eventDataCurrentPosition, _results);
-        return _results.Count > 0;
+        public static bool IsOverUI()
+        {
+            _eventDataCurrentPosition = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
+            _results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(_eventDataCurrentPosition, _results);
+            return _results.Count > 0;
+        }
     }
 }
-
