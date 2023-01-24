@@ -12,7 +12,7 @@ namespace NifuDev
 
         private void Start()
         {
-            DashCountText.text = player.GetDashesLeft_().ToString("00");
+            DashCountText.text = player.GetDashesLeft_().ToString("0") + "/3";
 
             player.OnDashesRefilled += PlayerController_OnDashesRefilled;
             player.OnDashesUsed += PlayerController_OnDashesUsed;
@@ -30,7 +30,7 @@ namespace NifuDev
 
         private void UpdateDashCountText()
         {
-            DashCountText.text = player.GetDashesLeft_().ToString("00");
+            DashCountText.text = player.GetDashesLeft_().ToString("0") + "/3";
         }
 
         private void OnDestroy()

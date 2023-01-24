@@ -25,7 +25,7 @@ namespace NifuDev
 
         private void Start()
         {
-            if (!FindObjectOfType<PlayerController>())
+            if (player == null)
             {
                 SpawnPlayer(spawnTransform.position);
             }
@@ -50,7 +50,10 @@ namespace NifuDev
             {
                 return;
             }
-            player = Instantiate(player, spawnPos, Quaternion.identity);
+            else
+            {
+                player = Instantiate(player, spawnPos, Quaternion.identity);
+            }
         }
 
         public PlayerController GetPlayerController()
