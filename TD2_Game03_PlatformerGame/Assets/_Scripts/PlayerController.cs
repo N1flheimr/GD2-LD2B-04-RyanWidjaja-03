@@ -10,7 +10,19 @@ namespace NifuDev
         public event Action OnDashesRefilled;
         public event Action OnDashesUsed;
 
-        public static PlayerController Instance;
+        private static PlayerController _instance;
+        public static PlayerController Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new PlayerController();
+                }
+                return _instance;
+            }
+        }
+        [SerializeField] private PlayerData data;
 
         private PlayerInput controls;
 
@@ -22,46 +34,48 @@ namespace NifuDev
 
         #region STATE PARAMETERS
         private bool isGrounded_;
-        private bool isOnRightWall_;
-        private bool isOnLeftWall_;
         private bool isJumping_;
         private bool isSliding_;
-
         private bool isDashing_;
-
+        private bool isDashAttacking_;
         private bool isJumpCut_;
 
-        //Dash
-        [SerializeField] private int dashesLeft_;
-        private bool dashRefilling_;
-        private Vector2 _lastDashDir;
-        private bool isDashAttacking_ = false;
+        private bool isWallJumping_;
+        private bool isOnRightWall_;
+        private bool isOnLeftWall_;
 
         private bool wasOnGround = true;
+        #endregion
 
-        private bool isWallJumping_;
+        //Dash
+        private int dashesLeft_;
+        private bool dashRefilling_;
+        private Vector2 _lastDashDir;
+
+        //WallJump
         private int lastWallJumpDir_;
         private float wallJumpStartTime_;
         //public bool useWallJump = true;
 
-        public float lastOnGroundTime { get; private set; }
-        public float lastOnWallTime { get; private set; }
-        public float lastOnWallRightTime { get; private set; }
-        public float lastOnWallLeftTime { get; private set; }
-        public float LastPressedDashTime { get; private set; }
+        #region TIMER
+        private float lastOnGroundTime;
+        private float lastOnWallTime;
+        private float lastOnWallRightTime;
+        private float lastOnWallLeftTime;
+        private float LastPressedDashTime;
+        private float lastPressedJumpTime;
         #endregion
-
 
         #region INPUT PARAMETERS
         private Vector2 moveInput_;
-        public float lastPressedJumpTime { get; private set; }
         #endregion
 
         #region CHECK PARAMETERS
-        [Header("Checks")]
+        [Header("Ground Checks")]
         [SerializeField] private Transform groundCheckPoint_;
         [SerializeField] private Vector2 groundCheckSize_;
         [Space(5)]
+        [Header("Wall Checks")]
         [SerializeField] private Transform frontWallCheckPoint_;
         [SerializeField] private Transform backWallCheckPoint_;
         [SerializeField] private Vector2 wallCheckSize_;
@@ -73,67 +87,6 @@ namespace NifuDev
         [Space(5)]
         #endregion
 
-        [Header("Run Parameters")]
-        [SerializeField] private float moveSpeed_;
-        [SerializeField] private float velPower_;
-        [SerializeField] private float acceleration_;
-        [SerializeField] private float deccelaration_;
-
-        [Range(0, 1f)]
-        [SerializeField] private float accelInAir;
-        [Range(0, 1f)]
-        [SerializeField] private float deccelInAir;
-
-        [Space(5)]
-
-        [SerializeField] private float fallClamp_;
-        [SerializeField] private float jumpCutGravityMult;
-
-        [Range(0, 0.5f)] public float coyoteTime;
-        [Range(0, 1.5f)] public float jumpBufferTime;
-
-        [SerializeField] private float jumpApexTimeThreshold;
-
-        [Range(0, 1f)]
-        [SerializeField] private float jumpApexGravityMult;
-
-        [SerializeField] private float jumpApexAccelerationMult;
-        [SerializeField] private float jumpApexMaxSpeedMult;
-        [Space(5)]
-
-        [Header("Wall Jump Parameters")]
-        [SerializeField] private Vector2 wallJumpForce;
-        [Range(0, 1f)][SerializeField] private float wallJumpRunLerp;
-        [Range(0, 0.5f)][SerializeField] private float wallJumpTime;
-        [Space(5)]
-
-        public float fallGravityMult;
-        public float gravityScale;
-        public float frictionAmount;
-        public float jumpForce_;
-        [Space(5)]
-
-        [Header("Dash Parameters")]
-        [Range(0, 0.5f)] public float dashInputBufferTime;
-        [Range(0f, 1f)] public float dashEndRunLerp;
-
-        [SerializeField] private int dashAmount;
-        [SerializeField] private float dashRefillTime;
-        [SerializeField] private float dashSleepTime;
-        [SerializeField] private float dashAttackTime;
-        [SerializeField] private float dashEndTime;
-
-        [SerializeField] private float dashSpeed;
-        [SerializeField] private Vector2 dashEndSpeed;
-        [Space(5)]
-
-
-        [Header("Slide Parameters")]
-        [SerializeField] private float slideSpeed;
-        [SerializeField] private float slideAccel;
-        [SerializeField] private Vector2 slideVelocity;
-        [SerializeField] private bool useSlideForce;
-
         private bool isFacingRight;
 
         private void Awake()
@@ -141,18 +94,13 @@ namespace NifuDev
             if (rb_ == null)
                 rb_ = GetComponent<Rigidbody2D>();
 
-            if (Instance == null)
-            {
-                Instance = this;
-            }
-
             controls = new PlayerInput();
         }
 
         private void Start()
         {
             isFacingRight = true;
-            SetGravityScale(gravityScale);
+            SetGravityScale(data.gravityScale);
 
             controls.PlayerControlOnGround.Move.performed += ctx => StartAction();
         }
@@ -192,19 +140,19 @@ namespace NifuDev
                 //Ground Check
                 if (Physics2D.OverlapBox(groundCheckPoint_.position, groundCheckSize_, 0, groundLayer_))
                 {
-                    lastOnGroundTime = coyoteTime;
+                    lastOnGroundTime = data.coyoteTime;
                 }
                 //Right Wall Check
                 if (((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)
                         || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight)))
                 {
-                    lastOnWallRightTime = coyoteTime;
+                    lastOnWallRightTime = data.coyoteTime;
                 }
                 //Left Wall Check
                 if (((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && !isFacingRight)
                     || (Physics2D.OverlapBox(backWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)))
                 {
-                    lastOnWallLeftTime = coyoteTime;
+                    lastOnWallLeftTime = data.coyoteTime;
                 }
 
                 lastOnWallTime = Mathf.Max(lastOnWallLeftTime, lastOnWallRightTime);
@@ -219,7 +167,7 @@ namespace NifuDev
                 isJumping_ = false;
             }
 
-            if (isWallJumping_ && Time.time - wallJumpStartTime_ > wallJumpTime)
+            if (isWallJumping_ && Time.time - wallJumpStartTime_ > data.wallJumpTime)
             {
                 isWallJumping_ = false;
             }
@@ -257,7 +205,7 @@ namespace NifuDev
             #region DASH CHECKS
             if (CanDash() && LastPressedDashTime > 0)
             {
-                Sleep(dashSleepTime);
+                Sleep(data.dashSleepTime);
 
                 if (moveInput_ != Vector2.zero)
                 {
@@ -300,21 +248,22 @@ namespace NifuDev
                 }
                 else if (rb_.velocity.y < 0)
                 {
-                    SetGravityScale(gravityScale * fallGravityMult);
-                    rb_.velocity = new Vector2(rb_.velocity.x, Mathf.Max(rb_.velocity.y, -fallClamp_));
+                    SetGravityScale(data.gravityScale * data.fallGravityMult);
+                    rb_.velocity = new Vector2(rb_.velocity.x, Mathf.Max(rb_.velocity.y, -data.fallClamp_));
                 }
                 else if (isJumpCut_)
                 {
-                    SetGravityScale(gravityScale * jumpCutGravityMult);
-                    rb_.velocity = new Vector2(rb_.velocity.x, Mathf.Max(rb_.velocity.y, -fallClamp_));
+                    SetGravityScale(data.gravityScale * data.jumpCutGravityMult);
+                    rb_.velocity = new Vector2(rb_.velocity.x, Mathf.Max(rb_.velocity.y, -data.fallClamp_));
                 }
-                else if (isJumping_ && Mathf.Abs(rb_.velocity.y) < jumpApexTimeThreshold)
+                else if (isJumping_ && Mathf.Abs(rb_.velocity.y) < data.jumpApexTimeThreshold)
                 {
-                    SetGravityScale(gravityScale * jumpApexGravityMult);
+                    SetGravityScale(data.gravityScale * data.jumpApexGravityMult);
+                    Debug.Log("Apex");
                 }
                 else
                 {
-                    SetGravityScale(gravityScale);
+                    SetGravityScale(data.gravityScale);
                 }
             }
             else
@@ -328,7 +277,7 @@ namespace NifuDev
 
             if (lastOnGroundTime > 0 && Mathf.Abs(moveInput_.x) < 0.01f)
             {
-                float amount = Mathf.Min(Mathf.Abs(rb_.velocity.x), Mathf.Abs(frictionAmount));
+                float amount = Mathf.Min(Mathf.Abs(rb_.velocity.x), Mathf.Abs(data.frictionAmount));
                 amount *= Mathf.Sign(rb_.velocity.x);
                 rb_.AddForce(Vector2.right * -amount, ForceMode2D.Impulse);
             }
@@ -341,7 +290,7 @@ namespace NifuDev
             {
                 if (isWallJumping_)
                 {
-                    Run(wallJumpRunLerp);
+                    Run(data.wallJumpRunLerp);
                 }
                 else
                 {
@@ -351,7 +300,7 @@ namespace NifuDev
 
             else if (isDashAttacking_)
             {
-                Run(dashEndRunLerp);
+                Run(data.dashEndRunLerp);
             }
             #endregion
 
@@ -368,24 +317,24 @@ namespace NifuDev
 
         private void Run(float lerpAmounts)
         {
-            float targetSpeed = moveInput_.x * moveSpeed_;
+            float targetSpeed = moveInput_.x * data.moveSpeed_;
             targetSpeed = Mathf.Lerp(rb_.velocity.x, targetSpeed, lerpAmounts);
 
             float accelRate;
 
             if (lastOnGroundTime > 0)
             {
-                accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration_ : deccelaration_;
+                accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? data.acceleration_ : data.deccelaration_;
             }
             else
             {
-                accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration_ * accelInAir : deccelaration_ * deccelInAir;
+                accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? data.acceleration_ * data.accelInAir : data.deccelaration_ * data.deccelInAir;
             }
 
-            if ((isJumping_ || isWallJumping_) && Mathf.Abs(rb_.velocity.y) < jumpApexTimeThreshold)
+            if ((isJumping_ || isWallJumping_) && Mathf.Abs(rb_.velocity.y) < data.jumpApexTimeThreshold)
             {
-                accelRate *= jumpApexAccelerationMult;
-                targetSpeed *= jumpApexMaxSpeedMult;
+                accelRate *= data.jumpApexAccelerationMult;
+                targetSpeed *= data.jumpApexMaxSpeedMult;
             }
 
             float speedDiff = targetSpeed - rb_.velocity.x;
@@ -400,7 +349,7 @@ namespace NifuDev
             lastOnGroundTime = 0;
 
             #region Perform Jump
-            float force = jumpForce_;
+            float force = data.jumpForce_;
             if (rb_.velocity.y < 0)
                 force -= rb_.velocity.y;
 
@@ -427,7 +376,7 @@ namespace NifuDev
             lastOnWallRightTime = 0;
             lastOnWallLeftTime = 0;
 
-            Vector2 force = new Vector2(wallJumpForce.x, wallJumpForce.y);
+            Vector2 force = new Vector2(data.wallJumpForce.x, data.wallJumpForce.y);
             force.x *= dir;
 
             if (Mathf.Sign(rb_.velocity.x) != Mathf.Sign(force.x))
@@ -443,7 +392,7 @@ namespace NifuDev
         }
         private void OnDashInput()
         {
-            LastPressedDashTime = dashInputBufferTime;
+            LastPressedDashTime = data.dashInputBufferTime;
         }
 
         private bool CanDash()
@@ -467,7 +416,7 @@ namespace NifuDev
         public void RefillDash()
         {
             dashesLeft_++;
-            dashesLeft_ = Mathf.Min(dashAmount, dashesLeft_);
+            dashesLeft_ = Mathf.Min(data.dashAmount, dashesLeft_);
             OnDashesRefilled?.Invoke();
         }
 
@@ -486,9 +435,9 @@ namespace NifuDev
 
             SetGravityScale(0);
 
-            while (Time.time - startTime <= dashAttackTime)
+            while (Time.time - startTime <= data.dashAttackTime)
             {
-                rb_.velocity = dir.normalized * dashSpeed;
+                rb_.velocity = dir.normalized * data.dashSpeed;
 
                 yield return null;
             }
@@ -497,11 +446,11 @@ namespace NifuDev
 
             isDashAttacking_ = false;
 
-            SetGravityScale(gravityScale);
+            SetGravityScale(data.gravityScale);
 
-            rb_.velocity = dashEndSpeed * dir.normalized;
+            rb_.velocity = data.dashEndSpeed * dir.normalized;
 
-            while (Time.time - startTime <= dashEndTime)
+            while (Time.time - startTime <= data.dashEndTime)
             {
                 yield return null;
             }
@@ -518,7 +467,7 @@ namespace NifuDev
         {
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                lastPressedJumpTime = jumpBufferTime;
+                lastPressedJumpTime = data.jumpInputBufferTime;
             }
         }
 
@@ -537,7 +486,7 @@ namespace NifuDev
 
         private void JumpCut()
         {
-            rb_.AddForce(Vector2.down * rb_.velocity * (1f - jumpCutGravityMult), ForceMode2D.Impulse);
+            rb_.AddForce(Vector2.down * rb_.velocity * (1f - data.jumpCutGravityMult), ForceMode2D.Impulse);
         }
 
         private bool CanSlide()
@@ -553,10 +502,10 @@ namespace NifuDev
         }
         private void Slide()
         {
-            if (useSlideForce)
+            if (data.useSlideForce)
             {
-                float speedDif = slideSpeed - rb_.velocity.y;
-                float movement = speedDif * -slideAccel;
+                float speedDif = data.slideSpeed - rb_.velocity.y;
+                float movement = speedDif * -data.slideAccel;
 
                 movement =
                     Mathf.Clamp(
@@ -566,7 +515,7 @@ namespace NifuDev
             }
             else
             {
-                rb_.velocity = -slideVelocity;
+                rb_.velocity = -data.slideVelocity;
             }
         }
 
