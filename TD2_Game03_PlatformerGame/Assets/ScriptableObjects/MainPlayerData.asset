@@ -28,8 +28,8 @@ MonoBehaviour:
   jumpApexMaxSpeedMult: 1.2
   jumpApexAccelerationMult: 1.1
   wallJumpForce: {x: 10, y: 17.5}
-  wallJumpRunLerp: 0.01
-  wallJumpTime: 0.25
+  wallJumpRunLerp: 0.075
+  wallJumpTime: 0.3
   gravityScale: 1.9
   fallGravityMult: 1.2
   jumpCutGravityMult: 1.75
