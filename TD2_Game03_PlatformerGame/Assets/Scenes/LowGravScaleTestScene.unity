@@ -138,7 +138,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
   m_PrefabInstance: {fileID: 3125273354775733951}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047289588}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 78aae8dbb0dd9d748a9c7595f6724803, type: 3}
@@ -9625,31 +9625,6 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: -0.05}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
---- !u!1 &1047289588 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3125273354618360157, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-  m_PrefabInstance: {fileID: 3125273354775733951}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &1047289593
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1047289588}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b08d7ba6647d58142a6bcca4aa16d424, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &1062708055
 GameObject:
   m_ObjectHideFlags: 0
@@ -10479,85 +10454,9 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2584107788582267081, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273353856606441, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354244905251, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.47
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354244905251, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.45
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: data
-      value: 
-      objectReference: {fileID: 11400000, guid: be36b2bdacae5e447b9585d7280f8f5c, type: 2}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: dashSpeed
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: dashAmount
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: jumpForce_
-      value: 15.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: wallJumpTime
-      value: 0.24
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: dashEndRunLerp
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: dashRefillTime
+    - target: {fileID: 1047289593, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
+      propertyPath: m_ApplyRootMotion
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: fallGravityMult
-      value: 1.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: wallJumpForce.x
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: wallJumpForce.y
-      value: 17.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: wallJumpRunLerp
-      value: 0.01
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: wallCheckSize_.x
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: wallCheckSize_.y
-      value: 0.45
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: groundCheckSize_.y
-      value: 0.04
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: jumpCutGravityMult
-      value: 1.75
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: jumpApexTimeThreshold
-      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 3125273354618360156, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
       propertyPath: m_RootOrder
@@ -10606,18 +10505,6 @@ PrefabInstance:
     - target: {fileID: 3125273354618360157, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273355225842522, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.47
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273355225842522, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.45
-      objectReference: {fileID: 0}
-    - target: {fileID: 3125273355511478348, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.01
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cb139ab96d8b6074580857c23dc26812, type: 3}

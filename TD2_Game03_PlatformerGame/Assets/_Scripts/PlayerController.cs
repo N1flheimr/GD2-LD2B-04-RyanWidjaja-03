@@ -30,6 +30,7 @@ namespace NifuDev
         private Rigidbody2D rb_;
         [SerializeField] private SpriteRenderer playerSprite;
         [SerializeField] private Transform wallCheckTransform;
+        private Animator animator;
         #endregion
 
         #region STATE PARAMETERS
@@ -95,6 +96,7 @@ namespace NifuDev
                 rb_ = GetComponent<Rigidbody2D>();
 
             controls = new PlayerInput();
+            animator = GetComponent<Animator>();
         }
 
         private void Start()
@@ -137,10 +139,22 @@ namespace NifuDev
             #region PHYSICS CHECKS
             if (!isDashing_ && !isJumping_)
             {
+                wasOnGround = isGrounded_;
                 //Ground Check
                 if (Physics2D.OverlapBox(groundCheckPoint_.position, groundCheckSize_, 0, groundLayer_))
                 {
                     lastOnGroundTime = data.coyoteTime;
+                    isGrounded_ = true;
+                }
+                else
+                {
+                    isGrounded_ = false;
+                }
+                if (!wasOnGround && isGrounded_)
+                {
+                    animator.SetTrigger("LandingTrigger");
+                    animator.SetBool("IsJumpFalling", false);
+                    Debug.Log("Test");
                 }
                 //Right Wall Check
                 if (((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)
@@ -165,6 +179,17 @@ namespace NifuDev
             if (rb_.velocity.y < 0 && isJumping_)
             {
                 isJumping_ = false;
+                animator.SetBool("IsJumping", false);
+            }
+            if (rb_.velocity.y > 0 && isJumping_)
+            {
+                animator.SetBool("IsJumping", true);
+                animator.SetBool("IsJumpFalling", false);
+            }
+
+            if (rb_.velocity.y < 0 && !isGrounded_)
+            {
+                animator.SetBool("IsJumpFalling", true);
             }
 
             if (isWallJumping_ && Time.time - wallJumpStartTime_ > data.wallJumpTime)
@@ -191,6 +216,7 @@ namespace NifuDev
                     wallJumpStartTime_ = Time.time;
                     lastWallJumpDir_ = (lastOnWallRightTime > 0) ? -1 : 1;
 
+                    animator.SetBool("IsJumping", false);
                     WallJump(lastWallJumpDir_);
                 }
             }
@@ -220,6 +246,7 @@ namespace NifuDev
                 isJumping_ = false;
                 isJumpCut_ = false;
 
+                animator.SetBool("IsJumping", false);
                 StartCoroutine(nameof(StartDash), _lastDashDir);
             }
 
@@ -340,6 +367,7 @@ namespace NifuDev
             float speedDiff = targetSpeed - rb_.velocity.x;
 
             float movement = speedDiff * accelRate;
+            animator.SetFloat("Speed", Mathf.Abs(moveInput_.x));
             rb_.AddForce(movement * Vector2.right, ForceMode2D.Force);
         }
 
