@@ -88,15 +88,25 @@ namespace NifuDev
         [Space(5)]
         #endregion
 
+        [SerializeField] private ParticleSystem footstepsParticleSystem;
+        [SerializeField] private ParticleSystem impactParticleSystem;
+        private ParticleSystem.EmissionModule footEmission;
+
         private bool isFacingRight;
 
         private void Awake()
         {
             if (rb_ == null)
+            {
                 rb_ = GetComponent<Rigidbody2D>();
+            }
 
             controls = new PlayerInput();
             animator = GetComponent<Animator>();
+            if (footstepsParticleSystem != null)
+            {
+                footEmission = footstepsParticleSystem.emission;
+            }
         }
 
         private void Start()
@@ -105,6 +115,7 @@ namespace NifuDev
             SetGravityScale(data.gravityScale);
 
             controls.PlayerControlOnGround.Move.performed += ctx => StartAction();
+
         }
 
         private void Update()
@@ -139,7 +150,6 @@ namespace NifuDev
             #region PHYSICS CHECKS
             if (!isDashing_ && !isJumping_)
             {
-                wasOnGround = isGrounded_;
                 //Ground Check
                 if (Physics2D.OverlapBox(groundCheckPoint_.position, groundCheckSize_, 0, groundLayer_))
                 {
@@ -149,12 +159,6 @@ namespace NifuDev
                 else
                 {
                     isGrounded_ = false;
-                }
-                if (!wasOnGround && isGrounded_)
-                {
-                    animator.SetTrigger("LandingTrigger");
-                    animator.SetBool("IsJumpFalling", false);
-                    Debug.Log("Test");
                 }
                 //Right Wall Check
                 if (((Physics2D.OverlapBox(frontWallCheckPoint_.position, wallCheckSize_, 0, groundLayer_) && isFacingRight)
@@ -172,6 +176,7 @@ namespace NifuDev
                 lastOnWallTime = Mathf.Max(lastOnWallLeftTime, lastOnWallRightTime);
             }
             #endregion
+
 
             #region JUMP
             OnJump();
@@ -300,14 +305,33 @@ namespace NifuDev
 
             #endregion
 
-
-
             if (lastOnGroundTime > 0 && Mathf.Abs(moveInput_.x) < 0.01f)
             {
                 float amount = Mathf.Min(Mathf.Abs(rb_.velocity.x), Mathf.Abs(data.frictionAmount));
                 amount *= Mathf.Sign(rb_.velocity.x);
                 rb_.AddForce(Vector2.right * -amount, ForceMode2D.Impulse);
             }
+
+            #region Animator & ParticleSystem
+            if (!wasOnGround && isGrounded_)
+            {
+                PlayImpactPSEffect();
+                animator.SetTrigger("LandingTrigger");
+                animator.SetBool("IsJumpFalling", false);
+            }
+            wasOnGround = isGrounded_;
+
+            if (Mathf.Abs(rb_.velocity.x) > 0.01f && isGrounded_ && !isJumping_ && !isDashing_)
+            {
+                footEmission.rateOverTime = 35f;
+            }
+            else
+            {
+                footEmission.rateOverTime = 0f;
+            }
+
+
+            #endregion
         }
 
         private void FixedUpdate()
@@ -463,6 +487,8 @@ namespace NifuDev
 
             SetGravityScale(0);
 
+            PlayImpactPSEffect();
+
             while (Time.time - startTime <= data.dashAttackTime)
             {
                 rb_.velocity = dir.normalized * data.dashSpeed;
@@ -572,6 +598,8 @@ namespace NifuDev
             wallCheckScale.x *= -1f;
             wallCheckTransform.localScale = wallCheckScale;
 
+            //footstepsParticleSystem.transform.localScale *= -1f;
+
             isFacingRight = !isFacingRight;
         }
 
@@ -586,6 +614,14 @@ namespace NifuDev
         public int GetDashesLeft_()
         {
             return dashesLeft_;
+        }
+
+        private void PlayImpactPSEffect()
+        {
+            impactParticleSystem.gameObject.SetActive(true);
+            impactParticleSystem.Stop();
+            impactParticleSystem.transform.position = footstepsParticleSystem.transform.position;
+            impactParticleSystem.Play();
         }
 
         private void OnEnable()
