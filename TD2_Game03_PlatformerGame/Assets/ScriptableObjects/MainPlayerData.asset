@@ -37,7 +37,7 @@ MonoBehaviour:
   dashEndRunLerp: 1
   dashAmount: 3
   dashRefillTime: 0
-  dashSleepTime: 0.04
+  dashSleepTime: 0.06
   dashAttackTime: 0.12
   dashEndTime: 0.12
   dashSpeed: 40

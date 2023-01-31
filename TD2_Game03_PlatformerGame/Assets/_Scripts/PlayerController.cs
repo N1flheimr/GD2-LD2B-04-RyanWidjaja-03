@@ -7,21 +7,11 @@ namespace NifuDev
 {
     public class PlayerController : MonoBehaviour
     {
+        public static PlayerController Instance;
+
         public event Action OnDashesRefilled;
         public event Action OnDashesUsed;
 
-        private static PlayerController _instance;
-        public static PlayerController Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new PlayerController();
-                }
-                return _instance;
-            }
-        }
         [SerializeField] private PlayerData data;
 
         private PlayerInput controls;
@@ -100,6 +90,7 @@ namespace NifuDev
             {
                 rb_ = GetComponent<Rigidbody2D>();
             }
+            Instance = this;
 
             controls = new PlayerInput();
             animator = GetComponent<Animator>();
@@ -195,6 +186,7 @@ namespace NifuDev
             if (rb_.velocity.y < 0 && !isGrounded_)
             {
                 animator.SetBool("IsJumpFalling", true);
+                Debug.Log("Falling");
             }
 
             if (isWallJumping_ && Time.time - wallJumpStartTime_ > data.wallJumpTime)
@@ -323,7 +315,7 @@ namespace NifuDev
 
             if (Mathf.Abs(rb_.velocity.x) > 0.01f && isGrounded_ && !isJumping_ && !isDashing_)
             {
-                footEmission.rateOverTime = 35f;
+                footEmission.rateOverTime = 25f;
             }
             else
             {
@@ -442,6 +434,24 @@ namespace NifuDev
 
             rb_.AddForce(force, ForceMode2D.Impulse);
         }
+
+        public void BalloonJump(float forceY)
+        {
+            lastPressedJumpTime = 0;
+            lastOnGroundTime = 0;
+            lastOnWallRightTime = 0;
+            lastOnWallLeftTime = 0;
+
+            Vector2 force = new Vector2(0f, forceY);
+
+            if (rb_.velocity.y < 0)
+            {
+                force.y -= rb_.velocity.y;
+            }
+
+            rb_.AddForce(force, ForceMode2D.Impulse);
+        }
+
         private void OnDashInput()
         {
             LastPressedDashTime = data.dashInputBufferTime;
@@ -488,6 +498,10 @@ namespace NifuDev
             SetGravityScale(0);
 
             PlayImpactPSEffect();
+
+            float shakeTime = 0.1f;
+            float shakeIntensity = 10f;
+            CinemachineShake.Instance.ShakeCamera(shakeIntensity, shakeTime);
 
             while (Time.time - startTime <= data.dashAttackTime)
             {
@@ -598,8 +612,6 @@ namespace NifuDev
             wallCheckScale.x *= -1f;
             wallCheckTransform.localScale = wallCheckScale;
 
-            //footstepsParticleSystem.transform.localScale *= -1f;
-
             isFacingRight = !isFacingRight;
         }
 
@@ -622,6 +634,11 @@ namespace NifuDev
             impactParticleSystem.Stop();
             impactParticleSystem.transform.position = footstepsParticleSystem.transform.position;
             impactParticleSystem.Play();
+        }
+
+        public bool GetIsDashAttacking()
+        {
+            return isDashAttacking_;
         }
 
         private void OnEnable()

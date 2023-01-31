@@ -22,7 +22,7 @@ namespace NifuDev
 
         private void Update()
         {
-            if (isActive)
+            if (isActive && GameState.Run == GameManager.Instance.GetCurrentState())
             {
                 currentTime += Time.deltaTime;
             }
@@ -38,6 +38,11 @@ namespace NifuDev
         public void StopStopwatch()
         {
             isActive = false;
+        }
+
+        public float GetCurrentTime()
+        {
+            return currentTime;
         }
     }
 }

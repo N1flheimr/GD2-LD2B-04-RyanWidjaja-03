@@ -3,10 +3,11 @@ using UnityEngine;
 
 namespace NifuDev
 {
-    public class Test : MonoBehaviour
+    public class RoomManager : MonoBehaviour
     {
         void Start()
         {
+
         }
 
         void Update()
