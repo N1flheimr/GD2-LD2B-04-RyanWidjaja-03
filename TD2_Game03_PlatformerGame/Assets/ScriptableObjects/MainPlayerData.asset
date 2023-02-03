@@ -32,7 +32,7 @@ MonoBehaviour:
   wallJumpTime: 0.325
   gravityScale: 1.75
   fallGravityMult: 1.2
-  jumpCutGravityMult: 1.25
+  jumpCutGravityMult: 1.3
   jumpApexGravityMult: 0.2
   dashEndRunLerp: 1
   dashAmount: 3
