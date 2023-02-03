@@ -7,12 +7,12 @@ namespace NifuDev
 {
     public class DashLeftUI : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI DashCountText;
+        [SerializeField] private TextMeshProUGUI dashCountText;
         [SerializeField] private PlayerController player;
 
         private void Start()
         {
-            DashCountText.text = player.GetDashesLeft_().ToString("0") + "/3";
+            dashCountText.text = player.GetDashesLeft_().ToString("0") + "/3";
 
             player.OnDashesRefilled += PlayerController_OnDashesRefilled;
             player.OnDashesUsed += PlayerController_OnDashesUsed;
@@ -30,7 +30,15 @@ namespace NifuDev
 
         private void UpdateDashCountText()
         {
-            DashCountText.text = player.GetDashesLeft_().ToString("0") + "/3";
+            dashCountText.text = player.GetDashesLeft_().ToString("0") + "/3";
+            if (player.GetDashesLeft_() == 3)
+            {
+                dashCountText.color = Color.red;
+            }
+            else
+            {
+                dashCountText.color = Color.white;
+            }
         }
 
         private void OnDestroy()

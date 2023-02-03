@@ -8,6 +8,7 @@ namespace NifuDev
 {
     public class StopwatchUI : MonoBehaviour
     {
+        public static StopwatchUI Instance { get; private set; }
         private float currentTime;
         private bool isActive;
         private TimeSpan time;
@@ -15,6 +16,15 @@ namespace NifuDev
 
         private void Start()
         {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(this);
+            }
+            else
+            {
+                Instance = this;
+            }
+
             currentTime = 0;
             stopwatchText.text = time.TotalMinutes.ToString("00") + ":" + time.TotalSeconds.ToString("00") + ":" + time.TotalMilliseconds.ToString("00");
             isActive = true;

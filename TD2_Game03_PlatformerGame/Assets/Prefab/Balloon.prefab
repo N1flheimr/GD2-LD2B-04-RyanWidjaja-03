@@ -63,7 +63,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnTime: 2.5
-  jumpForce: 20
+  jumpForce: 20.5
 --- !u!1 &8002127082526095524
 GameObject:
   m_ObjectHideFlags: 0

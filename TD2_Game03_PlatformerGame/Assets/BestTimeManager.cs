@@ -8,31 +8,72 @@ namespace NifuDev
 {
     public class BestTimeManager : MonoBehaviour
     {
-        private TimeSpan time;
-        [SerializeField] private List<float> levelBestTimeList = new List<float>();
-        [SerializeField] private float bestTime;
-        [SerializeField] private TextMeshProUGUI bestTimeText;
+        public static BestTimeManager Instance { get; private set; }
+
+        [SerializeField] private List<float> levelBestTimeList = new();
+
+        private void Awake()
+        {
+        }
 
         void Start()
         {
-            levelBestTimeList.Add(PlayerPrefs.GetFloat(SceneManager.GetActiveScene().name, 0f));
-            time = TimeSpan.FromSeconds(PlayerPrefs.GetFloat(SceneManager.GetActiveScene().name, 0f));
-            bestTimeText.text = time.ToString(@"mm\:ss\:ff");
+            if (Instance != null && Instance != this)
+            {
+                Destroy(this);
+                DontDestroyOnLoad(transform.root);
+            }
+            else
+            {
+                Instance = this;
+            }
+
+            for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+            {
+                if (PlayerPrefs.HasKey(SceneUtility.GetScenePathByBuildIndex(i)))
+                {
+                    levelBestTimeList.Add(PlayerPrefs.GetFloat(SceneUtility.GetScenePathByBuildIndex(i)));
+                }
+                else
+                {
+                    PlayerPrefs.SetFloat(SceneUtility.GetScenePathByBuildIndex(i), 999.9f);
+                    levelBestTimeList.Add(PlayerPrefs.GetFloat(SceneUtility.GetScenePathByBuildIndex(i)));
+                    Debug.Log(SceneManager.GetSceneByBuildIndex(i).name);
+                }
+            }
+
+            Goal.OnGoalReached += Goal_OnGoalReached;
         }
 
-        private void CheckBestTime()
+        private void Goal_OnGoalReached(float newTime)
         {
-
+            if (CheckIsBestTime(newTime))
+            {
+                SaveBestTime(newTime);
+            }
+            else
+            {
+                return;
+            }
         }
-        private void UpdateBestTimeText()
+
+        public bool CheckIsBestTime(float time)
         {
-            TimeSpan time = TimeSpan.FromSeconds(bestTime);
-            bestTimeText.text = time.ToString(@"mm\:ss\:ff");
+            if (time < levelBestTimeList[SceneManager.GetActiveScene().buildIndex])
+            {
+                return true;
+            }
+            return false;
         }
 
-        private void SaveBestTime()
+        public void SaveBestTime(float newBestTime)
         {
-
+            PlayerPrefs.SetFloat(SceneUtility.GetScenePathByBuildIndex(SceneManager.GetActiveScene().buildIndex), newBestTime);
+            levelBestTimeList[SceneManager.GetActiveScene().buildIndex] = newBestTime;
+        }
+        private void OnDestroy()
+        {
+            Goal.OnGoalReached -= Goal_OnGoalReached;
         }
     }
 }

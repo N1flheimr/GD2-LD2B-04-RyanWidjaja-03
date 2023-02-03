@@ -16,7 +16,7 @@ namespace NifuDev
         private void Goal_OnGoalReached(float stopwatchTime)
         {
             TimeSpan time;
-            time= TimeSpan.FromSeconds(stopwatchTime);
+            time = TimeSpan.FromSeconds(stopwatchTime);
             clearTimeText.text = time.ToString(@"mm\:ss\:ff");
         }
 
