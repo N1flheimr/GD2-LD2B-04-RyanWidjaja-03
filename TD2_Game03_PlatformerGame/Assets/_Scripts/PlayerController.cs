@@ -84,8 +84,6 @@ namespace NifuDev
 
         private bool isFacingRight;
 
-        [SerializeField] private bool isUsingDeveloperMode;
-
         private void Awake()
         {
             if (rb_ == null)
@@ -188,6 +186,7 @@ namespace NifuDev
             if (rb_.velocity.y < 0 && !isGrounded_)
             {
                 animator.SetBool("IsJumpFalling", true);
+                Debug.Log("Falling");
             }
 
             if (isWallJumping_ && Time.time - wallJumpStartTime_ > data.wallJumpTime)
@@ -445,15 +444,12 @@ namespace NifuDev
 
             Vector2 force = new Vector2(0f, forceY);
 
-            //if (rb_.velocity.y < 0)
-            //{
-            //    force.y -= rb_.velocity.y;
-            //    Debug.Log(force.y);
-            //}
+            if (rb_.velocity.y < 0)
+            {
+                force.y -= rb_.velocity.y;
+            }
 
-            rb_.velocity = Vector2.zero;
             rb_.AddForce(force, ForceMode2D.Impulse);
-            Debug.Log(force.y);
         }
 
         private void OnDashInput()
@@ -467,9 +463,8 @@ namespace NifuDev
             //{
             //    StartCoroutine(nameof(RefillDash), 1);
             //}
-            if (!isUsingDeveloperMode) return dashesLeft_ > 0;
 
-            return true;
+            return dashesLeft_ > 0;
         }
 
         //private IEnumerator RefillDash(int amount)
@@ -495,10 +490,7 @@ namespace NifuDev
 
             float startTime = Time.time;
 
-            if(dashesLeft_> 0)
-            {
-                dashesLeft_--;
-            }
+            dashesLeft_--;
 
             OnDashesUsed?.Invoke();
             isDashAttacking_ = true;
