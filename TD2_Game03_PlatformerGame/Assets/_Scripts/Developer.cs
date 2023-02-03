@@ -1,18 +1,18 @@
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
+using UnityEditor;
 
 namespace NifuDev
 {
     public class Developer
     {
-        void Start()
+        [MenuItem("Developer/Clear Saves")]
+        public static void ClearSaves()
         {
+            PlayerPrefs.DeleteAll();
 
-        }
-
-        void Update()
-        {
-
+            Debug.Log("All Save have been deleted");
         }
     }
 }
