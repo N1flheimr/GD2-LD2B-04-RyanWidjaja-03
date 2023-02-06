@@ -12,10 +12,6 @@ namespace NifuDev
         {
             GameManager.OnGameStateChanged += GameManager_OnGameStateChanged;
         }
-        private void Update()
-        {
-  
-        }
 
         private void GameManager_OnGameStateChanged(GameState state)
         {

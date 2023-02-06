@@ -14,6 +14,7 @@ namespace NifuDev
 
         private void Awake()
         {
+
         }
 
         void Start()
@@ -21,7 +22,6 @@ namespace NifuDev
             if (Instance != null && Instance != this)
             {
                 Destroy(this);
-                DontDestroyOnLoad(transform.root);
             }
             else
             {
@@ -38,7 +38,6 @@ namespace NifuDev
                 {
                     PlayerPrefs.SetFloat(SceneUtility.GetScenePathByBuildIndex(i), 999.9f);
                     levelBestTimeList.Add(PlayerPrefs.GetFloat(SceneUtility.GetScenePathByBuildIndex(i)));
-                    Debug.Log(SceneManager.GetSceneByBuildIndex(i).name);
                 }
             }
 
@@ -50,10 +49,6 @@ namespace NifuDev
             if (CheckIsBestTime(newTime))
             {
                 SaveBestTime(newTime);
-            }
-            else
-            {
-                return;
             }
         }
 
@@ -74,6 +69,11 @@ namespace NifuDev
         private void OnDestroy()
         {
             Goal.OnGoalReached -= Goal_OnGoalReached;
+        }
+
+        public List<float> GetLevelBestTimeList()
+        {
+            return levelBestTimeList;
         }
     }
 }
