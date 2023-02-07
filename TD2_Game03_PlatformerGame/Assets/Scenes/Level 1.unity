@@ -315,6 +315,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2140467969}
     m_Modifications:
+    - target: {fileID: 4700691536636636438, guid: b068e5a3747dcbc4dbe7f0b8960bb2a2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4700691537454291568, guid: b068e5a3747dcbc4dbe7f0b8960bb2a2, type: 3}
       propertyPath: m_Name
       value: ResultPanel
@@ -406,10 +410,6 @@ PrefabInstance:
     - target: {fileID: 4700691537454291571, guid: b068e5a3747dcbc4dbe7f0b8960bb2a2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4700691537515027111, guid: b068e5a3747dcbc4dbe7f0b8960bb2a2, type: 3}
-      propertyPath: m_Name
-      value: ClearTimeText
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b068e5a3747dcbc4dbe7f0b8960bb2a2, type: 3}
@@ -695,9 +695,9 @@ RectTransform:
   m_Children:
   - {fileID: 280256631}
   - {fileID: 345959181}
-  - {fileID: 2140467969}
-  - {fileID: 1153826273}
   - {fileID: 1548259172}
+  - {fileID: 1153826273}
+  - {fileID: 2140467969}
   m_Father: {fileID: 2029779454}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -7511,7 +7511,7 @@ RectTransform:
   m_Children:
   - {fileID: 359742533}
   m_Father: {fileID: 515902754}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -8044,7 +8044,7 @@ RectTransform:
   m_Children:
   - {fileID: 245339361}
   m_Father: {fileID: 515902754}
-  m_RootOrder: 2
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

@@ -12,11 +12,6 @@ namespace NifuDev
 
         [SerializeField] private List<float> levelBestTimeList = new();
 
-        private void Awake()
-        {
-
-        }
-
         void Start()
         {
             if (Instance != null && Instance != this)
