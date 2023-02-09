@@ -1,23 +1,36 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class GameAssets : MonoBehaviour
+namespace NifuDev
 {
-    public static GameAssets Instance { get; private set; }
-
-    public SoundAudioClip[] soundAudioClipArray;
-
-    [System.Serializable]
-    public class SoundAudioClip
+    public class GameAssets : MonoBehaviour
     {
-        public SoundManager.SoundType soundType;
-        public AudioClip audioClip;
-    }
+        public static GameAssets Instance { get; private set; }
+
+        public SoundAudioClip[] soundAudioClipArray;
+
+        public Image[] imageArray;
+
+        [System.Serializable]
+        public class SoundAudioClip
+        {
+            public SoundManager.SoundType soundType;
+            public AudioClip audioClip;
+        }
+
+        [System.Serializable]
+        public class Image
+        {
+            public ImageManager.Medal Medal;
+            public Sprite Sprite;
+        }
 
 
-    private void Awake()
-    {
-        Instance = this;
+        private void Awake()
+        {
+            Instance = this;
+        }
     }
 }

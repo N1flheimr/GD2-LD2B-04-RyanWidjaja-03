@@ -16,6 +16,21 @@ namespace NifuDev
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
             isSpawning = false;
         }
+        public void Damage()
+        {
+            spriteRenderer.enabled = false;
+            isSpawning = true;
+            SoundManager.PlaySound(SoundManager.SoundType.EnemyPop, 0.3f);
+            StartCoroutine(nameof(Spawn));
+        }
+
+        private IEnumerator Spawn()
+        {
+            yield return Helpers.GetWaitForSeconds(spawnTime);
+            spriteRenderer.enabled = true;
+            isSpawning = false;
+            StopCoroutine(nameof(Spawn));
+        }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
@@ -26,25 +41,14 @@ namespace NifuDev
                     if (!playerController.GetIsDashAttacking() && !isSpawning)
                     {
                         playerController.BalloonJump(jumpForce);
+                        Damage();
                     }
-                    Damage();
+                    else if (playerController.GetIsDashAttacking() && !isSpawning)
+                    {
+                        Damage();
+                    }
                 }
             }
-        }
-
-        public void Damage()
-        {
-            spriteRenderer.enabled = false;
-            isSpawning = true;
-            StartCoroutine(nameof(Spawn));
-        }
-
-        private IEnumerator Spawn()
-        {
-            yield return Helpers.GetWaitForSeconds(spawnTime);
-            spriteRenderer.enabled = true;
-            isSpawning = false;
-            StopCoroutine(nameof(Spawn));
         }
     }
 }

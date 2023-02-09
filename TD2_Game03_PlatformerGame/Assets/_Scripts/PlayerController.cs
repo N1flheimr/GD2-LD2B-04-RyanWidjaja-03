@@ -311,6 +311,7 @@ namespace NifuDev
                 PlayImpactPSEffect();
                 animator.SetTrigger("LandingTrigger");
                 animator.SetBool("IsJumpFalling", false);
+                SoundManager.PlaySound(SoundManager.SoundType.JumpLanding, 0.75f);
             }
             wasOnGround = isGrounded_;
 
@@ -385,6 +386,7 @@ namespace NifuDev
 
             float movement = speedDiff * accelRate;
             animator.SetFloat("Speed", Mathf.Abs(moveInput_.x));
+            //SoundManager.PlaySound(SoundManager.SoundType.PlayerFootsteps,1f);
             rb_.AddForce(movement * Vector2.right, ForceMode2D.Force);
         }
 
@@ -399,6 +401,7 @@ namespace NifuDev
                 force -= rb_.velocity.y;
 
             rb_.AddForce(Vector2.up * force, ForceMode2D.Impulse);
+            SoundManager.PlaySound(SoundManager.SoundType.Jump, 0.75f);
             #endregion
         }
 
@@ -432,6 +435,8 @@ namespace NifuDev
             {
                 force.y -= rb_.velocity.y;
             }
+
+            SoundManager.PlaySound(SoundManager.SoundType.Jump,0.75f);
 
             rb_.AddForce(force, ForceMode2D.Impulse);
         }
@@ -489,13 +494,13 @@ namespace NifuDev
 
         private IEnumerator StartDash(Vector2 dir)
         {
-
+            SoundManager.PlaySound(SoundManager.SoundType.Dash, 1.5f);
             lastOnGroundTime = 0;
             LastPressedDashTime = 0;
 
             float startTime = Time.time;
 
-            if(dashesLeft_> 0)
+            if (dashesLeft_ > 0)
             {
                 dashesLeft_--;
             }

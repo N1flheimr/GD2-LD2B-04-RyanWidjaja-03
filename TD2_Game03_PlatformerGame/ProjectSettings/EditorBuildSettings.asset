@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene/LowGravScaleTestScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
+    path: Assets/Scenes/SelectLevelScene.unity
+    guid: 2083f09a37d6aa54292e91d55a1238a3
+  - enabled: 1
     path: Assets/Scenes/Level 1.unity
     guid: 70afd726300126c4eb2ace641b99eb35
   - enabled: 1

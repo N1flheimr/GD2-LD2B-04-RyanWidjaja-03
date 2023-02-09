@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
-using System.Diagnostics;
 
 namespace NifuDev
 {
@@ -54,6 +53,10 @@ namespace NifuDev
                         LoadNextLevel();
                         break;
                 }
+            }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                SceneManager.LoadScene("SelectLevelScene");
             }
         }
 
@@ -120,14 +123,15 @@ namespace NifuDev
 
         public void LoadNextLevel()
         {
-            if (SceneManager.GetActiveScene().buildIndex <= SceneManager.sceneCount)
+            int currentScene = SceneManager.GetActiveScene().buildIndex;
+
+            int sceneCount = 4;
+            if (currentScene < sceneCount - 1)
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                SceneManager.LoadScene(currentScene + 1);
             }
             else
-            {
-
-            }
+                SceneManager.LoadScene("SelectLevelScene");
         }
 
     }
