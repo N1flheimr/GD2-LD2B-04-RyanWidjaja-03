@@ -23,7 +23,7 @@ namespace NifuDev
         [System.Serializable]
         public class Image
         {
-            public ImageManager.Medal Medal;
+            public ImageManager.MedalType medalType;
             public Sprite Sprite;
         }
 

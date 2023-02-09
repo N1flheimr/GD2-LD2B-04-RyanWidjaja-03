@@ -23,15 +23,16 @@ namespace NifuDev
             time = TimeSpan.FromSeconds(stopwatchTime);
             clearTimeText.text = time.ToString(@"mm\:ss\:ff");
 
-            if (stopwatchTime < LevelManager.Instance.GetGoldMetalTime())
+            if (stopwatchTime <= LevelManager.Instance.GetGoldMetalTime())
             {
                 medalImage.sprite = ImageManager.GetMedalSprite(ImageManager.MedalType.Gold);
+                Debug.Log("Gold");
             }
-            else if (stopwatchTime < LevelManager.Instance.GetSilverMetalTime() && stopwatchTime > LevelManager.Instance.GetGoldMetalTime())
+            else if (stopwatchTime <= LevelManager.Instance.GetSilverMetalTime() && stopwatchTime > LevelManager.Instance.GetGoldMetalTime())
             {
                 medalImage.sprite = ImageManager.GetMedalSprite(ImageManager.MedalType.Silver);
             }
-            if (stopwatchTime < LevelManager.Instance.GetBronzeMetalTime())
+            else if (stopwatchTime <= LevelManager.Instance.GetBronzeMetalTime()&& stopwatchTime > LevelManager.Instance.GetSilverMetalTime())
             {
                 medalImage.sprite = ImageManager.GetMedalSprite(ImageManager.MedalType.Bronze);
             }

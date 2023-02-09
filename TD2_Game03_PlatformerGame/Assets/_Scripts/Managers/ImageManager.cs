@@ -5,14 +5,14 @@ namespace NifuDev
 {
     public static class ImageManager
     {
-        public enum Medal
+        public enum MedalType
         {
             Bronze,
             Silver,
             Gold
         }
 
-        public static Sprite GetMedalSprite(Medal medalType)
+        public static Sprite GetMedalSprite(MedalType medalType)
         {
             foreach (GameAssets.Image image in GameAssets.Instance.imageArray)
             {
