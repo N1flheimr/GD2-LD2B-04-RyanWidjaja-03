@@ -23,18 +23,30 @@ namespace NifuDev
             time = TimeSpan.FromSeconds(stopwatchTime);
             clearTimeText.text = time.ToString(@"mm\:ss\:ff");
 
-            if (stopwatchTime <= LevelManager.Instance.GetGoldMetalTime())
+            TimeSpan goldTIme = TimeSpan.FromSeconds(LevelManager.Instance.GetGoldMetalTime());
+            TimeSpan silverTime = TimeSpan.FromSeconds(LevelManager.Instance.GetSilverMetalTime());
+            TimeSpan bronzeTime = TimeSpan.FromSeconds(LevelManager.Instance.GetBronzeMetalTime());
+
+            if (time <= goldTIme)
             {
                 medalImage.sprite = ImageManager.GetMedalSprite(ImageManager.MedalType.Gold);
                 Debug.Log("Gold");
             }
-            else if (stopwatchTime <= LevelManager.Instance.GetSilverMetalTime() && stopwatchTime > LevelManager.Instance.GetGoldMetalTime())
+            else if (time <= silverTime && time > goldTIme)
             {
                 medalImage.sprite = ImageManager.GetMedalSprite(ImageManager.MedalType.Silver);
+                Debug.Log("Silver");
             }
-            else if (stopwatchTime <= LevelManager.Instance.GetBronzeMetalTime()&& stopwatchTime > LevelManager.Instance.GetSilverMetalTime())
+            else if (time <= bronzeTime && time > silverTime)
             {
                 medalImage.sprite = ImageManager.GetMedalSprite(ImageManager.MedalType.Bronze);
+                Debug.Log("Bronze");
+            }
+
+            else
+            {
+                medalImage.sprite = ImageManager.GetMedalSprite(ImageManager.MedalType.NoMedal);
+                Debug.Log("NoMedal");
             }
 
             bestTimeText.text = BestTimeManager.Instance.GetBestTimeString();

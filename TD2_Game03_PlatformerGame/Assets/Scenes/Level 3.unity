@@ -218,6 +218,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6737335171325395002, guid: 68b4a6e19bbb9844a855a7b6b6bf0468, type: 3}
+      propertyPath: medalImage
+      value: 
+      objectReference: {fileID: 139207448}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68b4a6e19bbb9844a855a7b6b6bf0468, type: 3}
 --- !u!224 &139207446 stripped
@@ -230,6 +234,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6737335170600838201, guid: 68b4a6e19bbb9844a855a7b6b6bf0468, type: 3}
   m_PrefabInstance: {fileID: 139207445}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &139207448 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6291432277962335676, guid: 68b4a6e19bbb9844a855a7b6b6bf0468, type: 3}
+  m_PrefabInstance: {fileID: 139207445}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &157546471 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
@@ -494,18 +509,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1062708056}
     m_Modifications:
-    - target: {fileID: 7137640321230785828, guid: a757bcd4e71787649a9743d3fa4ba592, type: 3}
-      propertyPath: imageArray.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 7137640321230785828, guid: a757bcd4e71787649a9743d3fa4ba592, type: 3}
-      propertyPath: imageArray.Array.data[1].Medal
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7137640321230785828, guid: a757bcd4e71787649a9743d3fa4ba592, type: 3}
-      propertyPath: imageArray.Array.data[2].Medal
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 7137640321230785850, guid: a757bcd4e71787649a9743d3fa4ba592, type: 3}
       propertyPath: m_Name
       value: GameAssetManager
@@ -11458,6 +11461,7 @@ Transform:
   - {fileID: 1116949809}
   - {fileID: 1184325771}
   - {fileID: 317244229}
+  - {fileID: 1696072708}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -12110,6 +12114,53 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59e714daf09cd874d92bd249beeb2fc0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1696072707
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1696072708}
+  - component: {fileID: 1696072709}
+  m_Layer: 0
+  m_Name: LevelManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1696072708
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696072707}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1062708056}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1696072709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696072707}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ac830cc5962ae44bb1a44965f58db78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  goldMedalTime: 13
+  silverMedalTime: 15.5
+  bronzeMedalTime: 18
 --- !u!1 &1705901993
 GameObject:
   m_ObjectHideFlags: 0
@@ -12831,7 +12882,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3125273354618360152, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
       propertyPath: isUsingDeveloperMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3125273354618360156, guid: cb139ab96d8b6074580857c23dc26812, type: 3}
       propertyPath: m_RootOrder

@@ -19,6 +19,7 @@ namespace NifuDev
             player.RefillDash();
             spriteRenderer.enabled = false;
             isSpawning = true;
+            SoundManager.PlaySound(SoundManager.SoundType.DashRefill);
             StartCoroutine(nameof(Spawn));
         }
 

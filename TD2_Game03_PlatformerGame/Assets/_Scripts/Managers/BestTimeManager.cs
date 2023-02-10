@@ -77,6 +77,13 @@ namespace NifuDev
             bestTime = TimeSpan.FromSeconds(BestTimeManager.Instance.GetLevelBestTimeList()[SceneManager.GetActiveScene().buildIndex]);
             return bestTime.ToString(@"mm\:ss\:ff");
         }
+
+        public string GetBestTimeString(int level)
+        {
+            TimeSpan bestTime;
+            bestTime = TimeSpan.FromSeconds(BestTimeManager.Instance.GetLevelBestTimeList()[level]);
+            return bestTime.ToString(@"mm\:ss\:ff");
+        }
     }
 }
 

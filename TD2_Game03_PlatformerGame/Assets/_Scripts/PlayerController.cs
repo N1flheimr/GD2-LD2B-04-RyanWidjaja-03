@@ -131,6 +131,7 @@ namespace NifuDev
                 CheckDirectionToFace(moveInput_.x > 0.01f);
                 if (!isJumping_ && isGrounded_)
                 {
+                    SoundManager.PlaySound(SoundManager.SoundType.PlayerFootsteps,0.75f);
                 }
             }
 
@@ -386,7 +387,6 @@ namespace NifuDev
 
             float movement = speedDiff * accelRate;
             animator.SetFloat("Speed", Mathf.Abs(moveInput_.x));
-            //SoundManager.PlaySound(SoundManager.SoundType.PlayerFootsteps,1f);
             rb_.AddForce(movement * Vector2.right, ForceMode2D.Force);
         }
 
@@ -436,7 +436,7 @@ namespace NifuDev
                 force.y -= rb_.velocity.y;
             }
 
-            SoundManager.PlaySound(SoundManager.SoundType.Jump,0.75f);
+            SoundManager.PlaySound(SoundManager.SoundType.Jump, 0.75f);
 
             rb_.AddForce(force, ForceMode2D.Impulse);
         }

@@ -16,6 +16,7 @@ namespace NifuDev
                 StopwatchUI.Instance.StopStopwatch();
                 OnGoalReached?.Invoke(StopwatchUI.Instance.GetCurrentTime());
                 GameManager.Instance.UpdateGameState(GameState.Result);
+                SoundManager.PlaySound(SoundManager.SoundType.GoalReached,0.15f);
             }
         }
     }

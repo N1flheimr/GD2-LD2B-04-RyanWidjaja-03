@@ -9,7 +9,8 @@ namespace NifuDev
         {
             Bronze,
             Silver,
-            Gold
+            Gold,
+            NoMedal
         }
 
         public static Sprite GetMedalSprite(MedalType medalType)

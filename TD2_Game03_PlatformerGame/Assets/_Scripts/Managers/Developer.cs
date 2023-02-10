@@ -7,7 +7,7 @@ namespace NifuDev
 {
     public class Developer
     {
-        [MenuItem("Developer/Clear Saves")]
+        // [MenuItem("Developer/Clear Saves")]
         public static void ClearSaves()
         {
             PlayerPrefs.DeleteAll();

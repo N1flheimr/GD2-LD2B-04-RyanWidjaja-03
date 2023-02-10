@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
@@ -39,7 +39,9 @@ namespace NifuDev
         {
             if (Input.GetKeyDown(KeyCode.R))
             {
-                RestartScene();
+                Invoke(nameof(RestartScene), 0.12f);
+                
+                SoundManager.PlaySound(SoundManager.SoundType.PreparationScreenSpace);
             }
 
             if (Input.GetKeyDown(KeyCode.Space))
@@ -48,14 +50,23 @@ namespace NifuDev
                 {
                     case GameState.Preparation:
                         UpdateGameState(GameState.Run);
+
+                        SoundManager.PlaySound(SoundManager.SoundType.PreparationScreenSpace);
                         break;
                     case GameState.Result:
-                        LoadNextLevel();
+                        SoundManager.PlaySound(SoundManager.SoundType.PreparationScreenSpace);
+                        Invoke(nameof(LoadNextLevel), 0.12f);
                         break;
                 }
             }
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape) && SceneManager.GetActiveScene().name != "SelectLevelScene")
             {
+                if (GameObject.FindGameObjectWithTag("GameMusic").TryGetComponent<AudioSource>(out var audioSource))
+                {
+                    Destroy(audioSource.gameObject);
+                    Debug.Log("Destroyed");
+                }
+                SoundManager.PlaySound(SoundManager.SoundType.PreparationScreenSpace);
                 SceneManager.LoadScene("SelectLevelScene");
             }
         }
@@ -131,7 +142,14 @@ namespace NifuDev
                 SceneManager.LoadScene(currentScene + 1);
             }
             else
+            {
+                if (GameObject.FindGameObjectWithTag("GameMusic").TryGetComponent<AudioSource>(out var audioSource))
+                {
+                    Destroy(audioSource.gameObject);
+                    Debug.Log("Destroyed");
+                }
                 SceneManager.LoadScene("SelectLevelScene");
+            }
         }
 
     }

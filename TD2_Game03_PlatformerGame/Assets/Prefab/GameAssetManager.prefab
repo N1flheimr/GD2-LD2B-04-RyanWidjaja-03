@@ -55,10 +55,20 @@ MonoBehaviour:
     audioClip: {fileID: 8300000, guid: 034e6cead44d73943ab91f738ac45c6f, type: 3}
   - soundType: 4
     audioClip: {fileID: 8300000, guid: a055b52841718b84ca8b67d0b783a078, type: 3}
+  - soundType: 6
+    audioClip: {fileID: 8300000, guid: 6e33ddb37488d2d4192b1d657d3ee8e6, type: 3}
+  - soundType: 5
+    audioClip: {fileID: 8300000, guid: b0a135c19dbc2cc49909a2a583d55719, type: 3}
+  - soundType: 7
+    audioClip: {fileID: 8300000, guid: 564be36f1cb866c418806954b8dd7852, type: 3}
+  - soundType: 8
+    audioClip: {fileID: 8300000, guid: efc621fb8cd40fc4fb570ff1d2bb5a85, type: 3}
   imageArray:
-  - Medal: 0
-    Sprite: {fileID: 0}
-  - Medal: 1
-    Sprite: {fileID: 0}
-  - Medal: 2
-    Sprite: {fileID: 0}
+  - medalType: 3
+    Sprite: {fileID: 21300000, guid: 2bb4e96f5d0b02c468932d665a015c54, type: 3}
+  - medalType: 0
+    Sprite: {fileID: 21300000, guid: 9e9474494461bd048803b48e391ef0f6, type: 3}
+  - medalType: 1
+    Sprite: {fileID: 21300000, guid: 8325d4ef0a6eb3d43952aff8a06d9f45, type: 3}
+  - medalType: 2
+    Sprite: {fileID: 21300000, guid: 0f061b4bd0275bc4eb60f2af31e7375a, type: 3}

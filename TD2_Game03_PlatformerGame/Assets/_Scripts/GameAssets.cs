@@ -31,6 +31,8 @@ namespace NifuDev
         private void Awake()
         {
             Instance = this;
+
+            SoundManager.Initialize();
         }
     }
 }

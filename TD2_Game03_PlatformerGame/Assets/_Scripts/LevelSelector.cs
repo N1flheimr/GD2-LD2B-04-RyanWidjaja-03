@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+using System.Collections;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -16,9 +17,21 @@ namespace NifuDev
             button.onClick.AddListener(OpenScene);
         }
 
-        public void OpenScene()
+        IEnumerator OpenSceneCoroutine()
         {
+            //if (GameObject.FindGameObjectWithTag("GameMusic").TryGetComponent<AudioSource>(out AudioSource bgmMusic))
+            //{
+            //    //bgmMusic.Play();
+            //}
+
+            SoundManager.PlaySound(SoundManager.SoundType.LevelSelectClick, 0.5f);
+            yield return Helpers.GetWaitForSeconds(0.1f);
             SceneManager.LoadScene("Level " + levelNumber);
+        }
+
+        private void OpenScene()
+        {
+            StartCoroutine(nameof(OpenSceneCoroutine));
         }
     }
 }

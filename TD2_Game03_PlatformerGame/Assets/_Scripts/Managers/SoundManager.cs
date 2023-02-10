@@ -12,7 +12,11 @@ namespace NifuDev
             Jump,
             JumpLanding,
             Dash,
-            EnemyPop
+            EnemyPop,
+            LevelSelectClick,
+            PreparationScreenSpace,
+            DashRefill,
+            GoalReached
         }
 
         private static Dictionary<SoundType, float> soundTimerDictionary;
